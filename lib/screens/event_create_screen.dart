@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
@@ -26,9 +26,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   DateTime? _startDate;
   bool _isSaving = false;
 
-  File? _bannerFile;
-  File? _proofFile;
+  Uint8List? _bannerBytes;
+  Uint8List? _proofBytes;
   bool _uploadingProof = false;
+
 
   final _categories = [
     'Workshop',
@@ -61,38 +62,42 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   }
 
   Future<void> _pickBanner() async {
-    final picked = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (picked != null) setState(() => _bannerFile = File(picked.path));
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (picked != null) {
+      final bytes = await picked.readAsBytes();
+      setState(() => _bannerBytes = bytes);
+    }
   }
 
   Future<String?> _uploadBanner(String userId) async {
-    if (_bannerFile == null) return null;
-    final fileName =
-        '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    await supabase.storage
-        .from('event-banners')
-        .upload(fileName, _bannerFile!);
+    if (_bannerBytes == null) return null;
+    final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    await supabase.storage.from('event-banners').uploadBinary(fileName, _bannerBytes!);
     return supabase.storage.from('event-banners').getPublicUrl(fileName);
   }
 
   Future<void> _pickProofFile() async {
-    final picked = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (picked != null) {
-      setState(() => _proofFile = File(picked.path));
+      final bytes = await picked.readAsBytes();
+      setState(() => _proofBytes = bytes);
     }
   }
 
   Future<String?> _uploadProofFile(String userId) async {
-    if (_proofFile == null) return null;
+    if (_proofBytes == null) return null;
     setState(() => _uploadingProof = true);
     try {
-      final fileName =
-          '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       await supabase.storage
           .from('event-proofs')
-          .upload(fileName, _proofFile!);
+          .uploadBinary(fileName, _proofBytes!);
       return supabase.storage.from('event-proofs').getPublicUrl(fileName);
     } finally {
       if (mounted) setState(() => _uploadingProof = false);
@@ -107,7 +112,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       );
       return;
     }
-    if (_proofFile == null) {
+    if (_proofBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Bukti lembar pengesahan wajib diunggah')),
       );
@@ -147,7 +152,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Event berhasil dibuat, menunggu persetujuan admin')),
+          content: Text('Event berhasil dibuat, menunggu persetujuan admin'),
+        ),
       );
       Navigator.of(context).pop(true);
     } catch (e) {
@@ -186,8 +192,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                   color: AppColors.sand,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: _bannerFile != null
-                    ? Image.file(_bannerFile!, fit: BoxFit.cover)
+                child: _bannerBytes != null
+                    ? Image.memory(_bannerBytes!, fit: BoxFit.cover)
                     : const Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -210,8 +216,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             const SizedBox(height: 8),
             Text(
               'Ketuk gambar di atas untuk memilih banner event',
-              style:
-                  TextStyle(fontSize: 11, color: AppColors.lightTextSecondary),
+              style: TextStyle(
+                fontSize: 11,
+                color: AppColors.lightTextSecondary,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -300,23 +308,26 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.lightSurface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color:
-                        _proofFile != null ? AppColors.primary : Colors.black12,
+                    color: _proofBytes != null
+                        ? AppColors.primary
+                        : Colors.black12,
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      _proofFile != null
+                      _proofBytes != null
                           ? Icons.check_circle_rounded
                           : Icons.upload_file_outlined,
-                      color: _proofFile != null
+                      color: _proofBytes != null
                           ? AppColors.primary
                           : AppColors.lightTextSecondary,
                       size: 20,
@@ -324,12 +335,12 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _proofFile != null
+                        _proofBytes != null
                             ? 'File terpilih, siap diunggah'
                             : 'Ketuk untuk pilih file',
                         style: TextStyle(
                           fontSize: 13,
-                          color: _proofFile != null
+                          color: _proofBytes != null
                               ? AppColors.lightTextPrimary
                               : AppColors.lightTextSecondary,
                         ),
@@ -342,8 +353,10 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             const SizedBox(height: 6),
             Text(
               'Wajib diisi, digunakan admin untuk meninjau pengajuan event',
-              style:
-                  TextStyle(fontSize: 11, color: AppColors.lightTextSecondary),
+              style: TextStyle(
+                fontSize: 11,
+                color: AppColors.lightTextSecondary,
+              ),
             ),
             const SizedBox(height: 28),
 
@@ -356,27 +369,36 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                   backgroundColor: AppColors.primary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: _isSaving
                     ? const SizedBox(
                         width: 22,
                         height: 22,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2.4, color: Colors.white))
-                    : const Text('Ajukan Event',
+                          strokeWidth: 2.4,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Ajukan Event',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15)),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 8),
             Center(
               child: Text(
                 'Event akan tayang setelah disetujui admin',
-                style:
-                    TextStyle(fontSize: 12, color: AppColors.lightTextSecondary),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.lightTextSecondary,
+                ),
               ),
             ),
           ],
@@ -390,10 +412,11 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
       hintText: hint,
       filled: true,
       fillColor: AppColors.lightSurface,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
     );
   }
 }
@@ -406,11 +429,14 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(text,
-          style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.lightTextPrimary)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.lightTextPrimary,
+        ),
+      ),
     );
   }
 }

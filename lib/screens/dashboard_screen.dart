@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../main.dart' show supabase;
 import 'event_access_screen.dart';
 import 'event_manage_screen.dart';
+import '../widgets/screen_header.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -43,17 +44,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onRefresh: _refresh,
           child: CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-                  child: Text(
-                    'Dashboard',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.lightTextPrimary,
-                    ),
-                  ),
+              const SliverToBoxAdapter(
+                child: ScreenHeader(
+                  title: 'Dashboard',
+                  subtitle: 'Event yang kamu buat atau kelola',
                 ),
               ),
               SliverPadding(
@@ -77,7 +71,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Center(
                             child: Text(
                               'Kamu belum membuat event apapun',
-                              style: TextStyle(color: AppColors.lightTextSecondary),
+                              style: TextStyle(
+                                color: AppColors.lightTextSecondary,
+                              ),
                             ),
                           ),
                         ),
@@ -106,7 +102,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 class _DashboardEventCard extends StatelessWidget {
   final Event event;
   final VoidCallback onEventUpdated;
-  const _DashboardEventCard({required this.event, required this.onEventUpdated});
+  const _DashboardEventCard({
+    required this.event,
+    required this.onEventUpdated,
+  });
 
   bool get _isActive => event.status == 'active';
   bool get _isRejected => event.status == 'rejected';
@@ -161,14 +160,21 @@ class _DashboardEventCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: _statusColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     _statusLabel,
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _statusColor),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: _statusColor,
+                    ),
                   ),
                 ),
               ],
@@ -176,18 +182,30 @@ class _DashboardEventCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               event.title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.lightTextPrimary),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.lightTextPrimary,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               event.organizerName,
-              style: TextStyle(fontSize: 13, color: AppColors.lightTextSecondary),
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.lightTextSecondary,
+              ),
             ),
-            if (event.status == 'rejected' && event.rejectionReason != null) ...[
+            if (event.status == 'rejected' &&
+                event.rejectionReason != null) ...[
               const SizedBox(height: 8),
               Text(
                 'Alasan: ${event.rejectionReason}',
-                style: TextStyle(fontSize: 12, color: Colors.red.shade300, fontStyle: FontStyle.italic),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red.shade300,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ],
             const SizedBox(height: 12),
@@ -197,7 +215,10 @@ class _DashboardEventCard extends StatelessWidget {
                 height: 42,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final acceptedEvent = await showAccessCodeDialog(context, event);
+                    final acceptedEvent = await showAccessCodeDialog(
+                      context,
+                      event,
+                    );
                     if (acceptedEvent == null || !context.mounted) return;
                     final updatedEvent = await Navigator.push<Event>(
                       context,
@@ -212,9 +233,17 @@ class _DashboardEventCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: const Text('Masuk & Kelola Event', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: const Text(
+                    'Masuk & Kelola Event',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
           ],
