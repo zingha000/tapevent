@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/event.dart';
@@ -21,7 +21,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
   late final TextEditingController _organizerController;
   late final TextEditingController _contactController;
 
-  File? _newBannerFile;
+  Uint8List? _newBannerBytes;
   bool _isSaving = false;
 
   @override
@@ -57,16 +57,19 @@ class _EventEditScreenState extends State<EventEditScreen> {
       source: ImageSource.gallery,
       imageQuality: 80,
     );
-    if (picked != null) setState(() => _newBannerFile = File(picked.path));
+    if (picked != null) {
+      final bytes = await picked.readAsBytes();
+      setState(() => _newBannerBytes = bytes);
+    }
   }
 
   Future<String?> _uploadBanner() async {
-    if (_newBannerFile == null) return widget.event.bannerUrl;
+    if (_newBannerBytes == null) return widget.event.bannerUrl;
     final fileName =
         '${widget.event.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
     await supabase.storage
         .from('event-banners')
-        .upload(fileName, _newBannerFile!);
+        .uploadBinary(fileName, _newBannerBytes!);
     return supabase.storage.from('event-banners').getPublicUrl(fileName);
   }
 
@@ -118,9 +121,9 @@ class _EventEditScreenState extends State<EventEditScreen> {
       Navigator.of(context).pop(updatedEvent);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal menyimpan perubahan')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -149,8 +152,8 @@ class _EventEditScreenState extends State<EventEditScreen> {
                 color: AppColors.sand,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: _newBannerFile != null
-                  ? Image.file(_newBannerFile!, fit: BoxFit.cover)
+              child: _newBannerBytes != null
+                  ? Image.memory(_newBannerBytes!, fit: BoxFit.cover)
                   : (widget.event.bannerUrl != null
                         ? Image.network(
                             widget.event.bannerUrl!,
