@@ -43,7 +43,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refresh,
@@ -63,12 +63,12 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     height: 46,
     padding: const EdgeInsets.symmetric(horizontal: 14),
     decoration: BoxDecoration(
-      color: AppColors.lightSurface,
+      color: context.surface,
       borderRadius: BorderRadius.circular(14),
       border: Border.all(color: Colors.black.withOpacity(0.06)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.06),
+          color: context.shadowColor(0.06),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),
@@ -76,7 +76,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     ),
     child: Row(
       children: [
-        Icon(Icons.search_rounded, size: 20, color: AppColors.lightTextSecondary),
+        Icon(Icons.search_rounded, size: 20, color: context.textSecondary),
         const SizedBox(width: 8),
         Expanded(
           child: TextField(
@@ -84,7 +84,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             onChanged: (v) => setState(() => _query = v.toLowerCase()),
             decoration: InputDecoration(
               hintText: 'Cari event yang pernah diikuti...',
-              hintStyle: TextStyle(color: AppColors.lightTextSecondary, fontSize: 13),
+              hintStyle: TextStyle(color: context.textSecondary, fontSize: 13),
               border: InputBorder.none,
               isDense: true,
             ),
@@ -120,11 +120,11 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                           child: Center(
                             child: Column(
                               children: [
-                                Icon(Icons.history_rounded, size: 40, color: AppColors.lightTextSecondary),
+                                Icon(Icons.history_rounded, size: 40, color: context.textSecondary),
                                 const SizedBox(height: 10),
                                 Text(
                                   'Belum ada event yang selesai diikuti',
-                                  style: TextStyle(color: AppColors.lightTextSecondary),
+                                  style: TextStyle(color: context.textSecondary),
                                 ),
                               ],
                             ),
@@ -158,10 +158,10 @@ class _HistoryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: AppColors.lightSurface,
+        color: context.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12, offset: const Offset(0, 5)),
+          BoxShadow(color: context.shadowColor(0.05), blurRadius: 12, offset: const Offset(0, 5)),
         ],
       ),
       clipBehavior: Clip.antiAlias,
@@ -179,10 +179,10 @@ class _HistoryCard extends StatelessWidget {
                   children: [
                     Text(
                       event.title,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.lightTextPrimary),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.textPrimary),
                     ),
                     const SizedBox(height: 4),
-                    Text(event.organizerName, style: TextStyle(fontSize: 12, color: AppColors.lightTextSecondary)),
+                    Text(event.organizerName, style: TextStyle(fontSize: 12, color: context.textSecondary)),
                   ],
                 ),
               ),

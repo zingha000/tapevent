@@ -51,10 +51,10 @@ class PasswordField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.lightTextPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -67,20 +67,20 @@ class PasswordField extends StatelessWidget {
               onFieldSubmitted: nextFocusNode != null
                   ? (_) => nextFocusNode!.requestFocus()
                   : null,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: AppColors.lightTextPrimary,
+                color: context.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   fontSize: 16,
-                  color: AppColors.placeholder,
+                  color: context.placeholderColor,
                 ),
-                prefixIcon: const Icon(
+                prefixIcon: Icon(
                   Icons.lock_outline_rounded,
                   size: 20,
-                  color: AppColors.placeholder,
+                  color: context.placeholderColor,
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -88,21 +88,21 @@ class PasswordField extends StatelessWidget {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                     size: 20,
-                    color: AppColors.placeholder,
+                    color: context.placeholderColor,
                   ),
                   onPressed: onToggleVisibility,
                 ),
                 filled: true,
-                fillColor: AppColors.secondaryBackground,
+                fillColor: context.secondaryBg,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -194,7 +194,7 @@ class _StrengthIndicator extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: index < _filledSegments
                         ? _color
-                        : AppColors.border,
+                        : context.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

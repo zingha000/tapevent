@@ -63,11 +63,11 @@ class _SplashScreenState extends State<SplashScreen>
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
-                      color: AppColors.lightSurface,
+                      color: context.surface,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: context.shadowColor(0.1),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -80,12 +80,12 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'TapEvent',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.lightTextPrimary,
+                      color: context.textPrimary,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -94,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen>
                     'Kelola event kampus jadi mudah',
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.lightTextSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],

@@ -43,26 +43,26 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: _onTabChanged,
-        backgroundColor: AppColors.lightSurface,
+        backgroundColor: context.surface,
         indicatorColor: AppColors.primary.withOpacity(0.12),
         destinations: [
           NavigationDestination(
-            icon: Icon(AppIcons.home, color: AppColors.lightTextSecondary),
+            icon: Icon(AppIcons.home, color: context.textSecondary),
             selectedIcon: Icon(AppIcons.home, color: AppColors.primary),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(AppIcons.dashboard, color: AppColors.lightTextSecondary),
+            icon: Icon(AppIcons.dashboard, color: context.textSecondary),
             selectedIcon: Icon(AppIcons.dashboard, color: AppColors.primary),
             label: 'Dashboard',
           ),
           NavigationDestination(
-            icon: Icon(AppIcons.history, color: AppColors.lightTextSecondary),
+            icon: Icon(AppIcons.history, color: context.textSecondary),
             selectedIcon: Icon(AppIcons.history, color: AppColors.primary),
             label: 'Riwayat',
           ),
           NavigationDestination(
-            icon: Icon(AppIcons.profile, color: AppColors.lightTextSecondary),
+            icon: Icon(AppIcons.profile, color: context.textSecondary),
             selectedIcon: Icon(AppIcons.profile, color: AppColors.primary),
             label: 'Saya',
           ),

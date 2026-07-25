@@ -132,7 +132,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: const Text('Edit Event'),
         backgroundColor: AppColors.primary,
@@ -181,7 +181,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
           const SizedBox(height: 8),
           Text(
             'Ketuk gambar di atas untuk mengganti banner',
-            style: TextStyle(fontSize: 11, color: AppColors.lightTextSecondary),
+            style: TextStyle(fontSize: 11, color: context.textSecondary),
           ),
           const SizedBox(height: 20),
 
@@ -260,7 +260,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: AppColors.lightSurface,
+      fillColor: context.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -280,10 +280,10 @@ class _Label extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: AppColors.lightTextPrimary,
+          color: context.textPrimary,
         ),
       ),
     );

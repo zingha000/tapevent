@@ -11,12 +11,12 @@ class FooterLogin extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           'Sudah memiliki akun?',
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: AppColors.lightTextSecondary,
+            color: context.textSecondary,
           ),
         ),
         const SizedBox(height: 4),

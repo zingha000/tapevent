@@ -4,7 +4,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
 import '../widgets/screen_header.dart';
 import '../services/profile_service.dart';
-import '../main.dart' show supabase;
+import '../main.dart' show supabase, themeNotifier, toggleDarkMode;
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 import 'change_password_screen.dart';
@@ -42,8 +42,10 @@ class _SayaScreenState extends State<SayaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -60,7 +62,7 @@ class _SayaScreenState extends State<SayaScreen> {
                     children: [
                       CircleAvatar(
                         radius: 26,
-                        backgroundColor: AppColors.primary.withOpacity(0.12),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.12),
                         child: Text(
                           (profile?['full_name'] as String?)?.isNotEmpty == true
                               ? profile!['full_name'][0].toUpperCase()
@@ -75,12 +77,12 @@ class _SayaScreenState extends State<SayaScreen> {
                           children: [
                             Text(
                               profile?['full_name'] ?? '-',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.lightTextPrimary),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.textPrimary),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               profile?['role'] == 'dosen' ? 'Dosen' : 'Mahasiswa',
-                              style: TextStyle(fontSize: 12, color: AppColors.lightTextSecondary),
+                              style: TextStyle(fontSize: 12, color: context.textSecondary),
                             ),
                           ],
                         ),
@@ -110,6 +112,10 @@ class _SayaScreenState extends State<SayaScreen> {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
               },
             ),
+
+            const SizedBox(height: 8),
+            _SectionLabel('Preferensi'),
+            _DarkModeTile(isDark: isDark),
 
             const SizedBox(height: 8),
             _SectionLabel('Lainnya'),
@@ -178,6 +184,28 @@ class _SayaScreenState extends State<SayaScreen> {
   }
 }
 
+class _DarkModeTile extends StatelessWidget {
+  final bool isDark;
+  const _DarkModeTile({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+        color: context.textPrimary,
+        size: 22,
+      ),
+      title: Text('Mode Gelap', style: TextStyle(fontSize: 14, color: context.textPrimary)),
+      trailing: Switch(
+        value: isDark,
+        onChanged: (v) => toggleDarkMode(v),
+        activeColor: AppColors.primary,
+      ),
+    );
+  }
+}
+
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
@@ -188,7 +216,7 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
       child: Text(
         text,
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.lightTextSecondary),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: context.textSecondary),
       ),
     );
   }
@@ -205,9 +233,9 @@ class _MenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      leading: Icon(icon, color: AppColors.lightTextPrimary, size: 22),
-      title: Text(label, style: const TextStyle(fontSize: 14, color: AppColors.lightTextPrimary)),
-      trailing: Icon(Icons.chevron_right_rounded, color: AppColors.lightTextSecondary),
+      leading: Icon(icon, color: context.textPrimary, size: 22),
+      title: Text(label, style: TextStyle(fontSize: 14, color: context.textPrimary)),
+      trailing: Icon(Icons.chevron_right_rounded, color: context.textSecondary),
     );
   }
 }

@@ -169,7 +169,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: const Text('Buat Event Anda'),
         backgroundColor: AppColors.primary,
@@ -218,7 +218,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               'Ketuk gambar di atas untuk memilih banner event',
               style: TextStyle(
                 fontSize: 11,
-                color: AppColors.lightTextSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 20),
@@ -270,8 +270,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                       : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
                   style: TextStyle(
                     color: _startDate == null
-                        ? AppColors.lightTextSecondary
-                        : AppColors.lightTextPrimary,
+                        ? context.textSecondary
+                        : context.textPrimary,
                   ),
                 ),
               ),
@@ -313,7 +313,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.lightSurface,
+                  color: context.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _proofBytes != null
@@ -329,7 +329,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                           : Icons.upload_file_outlined,
                       color: _proofBytes != null
                           ? AppColors.primary
-                          : AppColors.lightTextSecondary,
+                          : context.textSecondary,
                       size: 20,
                     ),
                     const SizedBox(width: 10),
@@ -341,8 +341,8 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                         style: TextStyle(
                           fontSize: 13,
                           color: _proofBytes != null
-                              ? AppColors.lightTextPrimary
-                              : AppColors.lightTextSecondary,
+                              ? context.textPrimary
+                              : context.textSecondary,
                         ),
                       ),
                     ),
@@ -355,7 +355,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               'Wajib diisi, digunakan admin untuk meninjau pengajuan event',
               style: TextStyle(
                 fontSize: 11,
-                color: AppColors.lightTextSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 28),
@@ -397,7 +397,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 'Event akan tayang setelah disetujui admin',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.lightTextSecondary,
+                color: context.textSecondary,
                 ),
               ),
             ),
@@ -411,7 +411,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: AppColors.lightSurface,
+      fillColor: context.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -431,10 +431,10 @@ class _Label extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: AppColors.lightTextPrimary,
+          color: context.textPrimary,
         ),
       ),
     );

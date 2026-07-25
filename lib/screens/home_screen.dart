@@ -32,7 +32,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: refresh,
@@ -140,11 +140,11 @@ class _EventCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.lightSurface,
+        color: context.surface,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: context.shadowColor(0.06),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -202,10 +202,10 @@ class _EventCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     event.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.lightTextPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   if (event.tagline != null) ...[
@@ -214,7 +214,7 @@ class _EventCard extends StatelessWidget {
                       event.tagline!,
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.lightTextSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ],
@@ -224,21 +224,21 @@ class _EventCard extends StatelessWidget {
                       Icon(
                         AppIcons.calendar,
                         size: 14,
-                        color: AppColors.lightTextSecondary,
+                        color: context.textSecondary,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         '${event.startDate.day}/${event.startDate.month}/${event.startDate.year}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.lightTextSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                       const SizedBox(width: 14),
                       Icon(
                         Icons.groups_outlined,
                         size: 14,
-                        color: AppColors.lightTextSecondary,
+                        color: context.textSecondary,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -247,7 +247,7 @@ class _EventCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.lightTextSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ),
@@ -350,7 +350,7 @@ class _HeaderSection extends StatelessWidget {
                   children: [
                     Icon(
                       AppIcons.search,
-                      color: AppColors.lightTextSecondary,
+                      color: context.textSecondary,
                       size: 20,
                     ),
                     const SizedBox(width: 10),
@@ -359,7 +359,7 @@ class _HeaderSection extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: 'Cari event...',
                           hintStyle: TextStyle(
-                            color: AppColors.lightTextSecondary,
+                            color: context.textSecondary,
                             fontSize: 14,
                           ),
                           border: InputBorder.none,

@@ -18,7 +18,7 @@ class RoleSelector extends StatelessWidget {
       height: 48,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.secondaryBackground,
+        color: context.secondaryBg,
         borderRadius: BorderRadius.circular(999),
       ),
       child: LayoutBuilder(
@@ -61,7 +61,7 @@ class RoleSelector extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: selectedRole == UserRole.mahasiswa
                                 ? Colors.white
-                                : AppColors.lightTextSecondary,
+                                : context.textSecondary,
                           ),
                           child: const Text('Mahasiswa'),
                         ),
@@ -80,7 +80,7 @@ class RoleSelector extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: selectedRole == UserRole.dosen
                                 ? Colors.white
-                                : AppColors.lightTextSecondary,
+                                : context.textSecondary,
                           ),
                           child: const Text('Dosen'),
                         ),

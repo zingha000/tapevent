@@ -9,7 +9,7 @@ class StaticInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: Text(title),
         backgroundColor: AppColors.primary,
@@ -17,7 +17,7 @@ class StaticInfoScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Text(content, style: TextStyle(fontSize: 14, height: 1.6, color: AppColors.lightTextSecondary)),
+        child: Text(content, style: TextStyle(fontSize: 14, height: 1.6, color: context.textSecondary)),
       ),
     );
   }

@@ -47,7 +47,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: const Text('Keamanan'),
         backgroundColor: AppColors.primary,
@@ -58,14 +58,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            const Text('Password Baru', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary)),
+            Text('Password Baru', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary)),
             const SizedBox(height: 6),
             TextFormField(
               controller: _passwordController,
               obscureText: _obscure,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: AppColors.lightSurface,
+                fillColor: context.surface,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 suffixIcon: IconButton(
@@ -79,14 +79,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               },
             ),
             const SizedBox(height: 16),
-            const Text('Konfirmasi Password Baru', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary)),
+            Text('Konfirmasi Password Baru', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary)),
             const SizedBox(height: 6),
             TextFormField(
               controller: _confirmController,
               obscureText: _obscure,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: AppColors.lightSurface,
+                fillColor: context.surface,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               ),

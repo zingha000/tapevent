@@ -62,7 +62,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: const Text('Data Pribadi'),
         backgroundColor: AppColors.primary,
@@ -90,7 +90,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: _decoration().copyWith(fillColor: Colors.black.withOpacity(0.03)),
           ),
           const SizedBox(height: 4),
-          Text('Email tidak dapat diubah', style: TextStyle(fontSize: 11, color: AppColors.lightTextSecondary)),
+          Text('Email tidak dapat diubah', style: TextStyle(fontSize: 11, color: context.textSecondary)),
 
           const SizedBox(height: 28),
           SizedBox(
@@ -116,7 +116,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   InputDecoration _decoration() {
     return InputDecoration(
       filled: true,
-      fillColor: AppColors.lightSurface,
+      fillColor: context.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
     );
@@ -131,7 +131,7 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary)),
+      child: Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary)),
     );
   }
 }

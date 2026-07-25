@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnim,
@@ -166,12 +166,12 @@ class _LoginScreenState extends State<LoginScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Belum punya akun? ',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.lightTextSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                             GestureDetector(

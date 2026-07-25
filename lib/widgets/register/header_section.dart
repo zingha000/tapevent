@@ -22,13 +22,13 @@ class HeaderSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Buat Akun',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            color: AppColors.lightTextPrimary,
+            color: context.textPrimary,
             letterSpacing: -0.32,
           ),
         ),
@@ -36,10 +36,10 @@ class HeaderSection extends StatelessWidget {
         Text(
           'Daftar untuk mulai menggunakan TapEvent',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: AppColors.lightTextSecondary,
+            color: context.textSecondary,
           ),
         ),
       ],

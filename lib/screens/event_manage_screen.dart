@@ -97,21 +97,21 @@ class _EventManageScreenState extends State<EventManageScreen> {
                   color: Colors.transparent,
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 32),
-                    padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Hapus Event',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.lightTextPrimary)),
+                         Text('Hapus Event',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary)),
                         const SizedBox(height: 6),
                         Text('Tindakan ini tidak bisa dibatalkan. Jelaskan alasan penghapusan:',
-                            style: TextStyle(fontSize: 13, color: AppColors.lightTextSecondary)),
+                            style: TextStyle(fontSize: 13, color: context.textSecondary)),
                         const SizedBox(height: 14),
                         TextField(
                           controller: reasonController,
@@ -119,7 +119,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           decoration: InputDecoration(
                             hintText: 'Contoh: Event dibatalkan karena...',
                             filled: true,
-                            fillColor: AppColors.lightBackground,
+                            fillColor: context.bg,
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -143,7 +143,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                     side: const BorderSide(color: Colors.black12),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   ),
-                                  child: Text('Batal', style: TextStyle(color: AppColors.lightTextSecondary, fontWeight: FontWeight.w600)),
+                                  child: Text('Batal', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
                                 ),
                               ),
                             ),
@@ -222,11 +222,11 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 28),
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.lightSurface,
+                      color: context.surface,
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: context.shadowColor(0.2),
                           blurRadius: 30,
                           offset: const Offset(0, 12),
                         ),
@@ -235,12 +235,12 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           'QR Absensi Event',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.lightTextPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 18),
@@ -254,7 +254,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           'Tunjukkan QR ini ke peserta untuk absen',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.lightTextSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -368,19 +368,19 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 32),
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Hapus ${profile?['full_name'] ?? 'Peserta'}',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.lightTextPrimary)),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary)),
                         const SizedBox(height: 6),
                         Text('Jelaskan alasan penghapusan peserta ini:',
-                            style: TextStyle(fontSize: 13, color: AppColors.lightTextSecondary)),
+                            style: TextStyle(fontSize: 13, color: context.textSecondary)),
                         const SizedBox(height: 14),
                         TextField(
                           controller: reasonController,
@@ -388,7 +388,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           decoration: InputDecoration(
                             hintText: 'Contoh: Salah input NIM saat upload',
                             filled: true,
-                            fillColor: AppColors.lightBackground,
+                            fillColor: context.bg,
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -412,7 +412,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                     side: const BorderSide(color: Colors.black12),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   ),
-                                  child: Text('Batal', style: TextStyle(color: AppColors.lightTextSecondary, fontWeight: FontWeight.w600)),
+                                   child: Text('Batal', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
                                 ),
                               ),
                             ),
@@ -472,7 +472,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
               'Alasan dari peserta:',
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.lightTextSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 6),
@@ -482,9 +482,9 @@ class _EventManageScreenState extends State<EventManageScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop('reject'),
-            child: const Text(
+            child: Text(
               'Tolak',
-              style: TextStyle(color: AppColors.lightTextSecondary),
+              style: TextStyle(color: context.textSecondary),
             ),
           ),
           TextButton(
@@ -528,7 +528,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
         Navigator.of(context).pop(_event);
       },
       child: Scaffold(
-        backgroundColor: AppColors.lightBackground,
+        backgroundColor: context.bg,
         appBar: AppBar(
           title: Text(_event.title, overflow: TextOverflow.ellipsis),
           backgroundColor: AppColors.primary,
@@ -562,10 +562,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       Expanded(
                         child: Text(
                           _event.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.lightTextPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -605,7 +605,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.5,
-                      color: AppColors.lightTextSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
 
@@ -668,13 +668,13 @@ class _EventManageScreenState extends State<EventManageScreen> {
                   const SizedBox(height: 24),
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Daftar Peserta',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.lightTextPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -705,7 +705,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     'Format: baris pertama header, kolom pertama = NIM/NIP',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.lightTextSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -727,7 +727,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             child: Text(
                               'Belum ada peserta terdaftar',
                               style: TextStyle(
-                                color: AppColors.lightTextSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                           ),
@@ -747,20 +747,20 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             constraints: const BoxConstraints(minWidth: 640),
                             child: DataTable(
                               headingRowColor: WidgetStateProperty.all(
-                                AppColors.lightBackground,
+                                context.bg,
                               ),
                               dataRowMinHeight: 56,
                               dataRowMaxHeight: 64,
                               columnSpacing: 20,
                               horizontalMargin: 16,
-                              headingTextStyle: const TextStyle(
+                              headingTextStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.lightTextPrimary,
+                                color: context.textPrimary,
                               ),
-                              dataTextStyle: const TextStyle(
+                              dataTextStyle: TextStyle(
                                 fontSize: 13,
-                                color: AppColors.lightTextPrimary,
+                                color: context.textPrimary,
                               ),
                               columns: const [
                                 DataColumn(label: Text('No')),
@@ -843,8 +843,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                           : Text(
                                               '-',
                                               style: TextStyle(
-                                                color: AppColors
-                                                    .lightTextSecondary,
+                                                color: context.textSecondary,
                                               ),
                                             ),
                                     ),
@@ -897,19 +896,19 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.vpn_key_outlined,
                             size: 18,
-                            color: AppColors.lightTextPrimary,
+                            color: context.textPrimary,
                           ),
                           const SizedBox(width: 10),
-                          const Expanded(
+                          Expanded(
                             child: Text(
                               'Ganti Kode Akses',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.lightTextPrimary,
+                                color: context.textPrimary,
                               ),
                             ),
                           ),
@@ -917,7 +916,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             _showAccessCode
                                 ? Icons.expand_less_rounded
                                 : Icons.expand_more_rounded,
-                            color: AppColors.lightTextSecondary,
+                            color: context.textSecondary,
                           ),
                         ],
                       ),
@@ -934,7 +933,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.lightSurface,
+                          color: context.surface,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
@@ -944,7 +943,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                               'Kode Akses Saat Ini',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.lightTextSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -1046,10 +1045,10 @@ class _LinkSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.lightTextPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -1058,7 +1057,7 @@ class _LinkSection extends StatelessWidget {
           decoration: InputDecoration(
             hintText: 'https://drive.google.com/...',
             filled: true,
-            fillColor: AppColors.lightSurface,
+            fillColor: context.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,

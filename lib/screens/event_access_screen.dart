@@ -71,7 +71,7 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
           margin: const EdgeInsets.symmetric(horizontal: 32),
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
           decoration: BoxDecoration(
-            color: AppColors.lightSurface,
+            color: context.surface,
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
@@ -95,16 +95,16 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
                 child: const Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 28),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Masukkan Kode Akses',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.lightTextPrimary),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary),
               ),
               const SizedBox(height: 6),
               Text(
                 'Kode ini didapat dari pembuat event\n"${widget.event.title}"',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: AppColors.lightTextSecondary, height: 1.4),
+                style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.4),
               ),
               const SizedBox(height: 20),
               TextField(
@@ -117,7 +117,7 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
                   hintText: 'Kode',
                   errorText: _errorText,
                   filled: true,
-                  fillColor: AppColors.lightBackground,
+                  fillColor: context.bg,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -138,7 +138,7 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
                           side: const BorderSide(color: Colors.black12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: Text('Batal', style: TextStyle(color: AppColors.lightTextSecondary, fontWeight: FontWeight.w600)),
+                        child: Text('Batal', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
                       ),
                     ),
                   ),

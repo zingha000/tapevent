@@ -38,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: context.bg,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refresh,
@@ -72,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Text(
                               'Kamu belum membuat event apapun',
                               style: TextStyle(
-                                color: AppColors.lightTextSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                           ),
@@ -139,7 +139,7 @@ class _DashboardEventCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.lightSurface,
+          color: context.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: greyedOut ? Colors.black12 : Colors.transparent,
@@ -148,7 +148,7 @@ class _DashboardEventCard extends StatelessWidget {
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: context.shadowColor(0.06),
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
@@ -182,10 +182,10 @@ class _DashboardEventCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               event.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.lightTextPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -193,7 +193,7 @@ class _DashboardEventCard extends StatelessWidget {
               event.organizerName,
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.lightTextSecondary,
+                color: context.textSecondary,
               ),
             ),
             if (event.status == 'rejected' &&

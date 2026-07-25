@@ -44,10 +44,10 @@ class AppTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.lightTextPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -63,33 +63,33 @@ class AppTextField extends StatelessWidget {
           onFieldSubmitted: nextFocusNode != null
               ? (_) => nextFocusNode!.requestFocus()
               : null,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
-            color: AppColors.lightTextPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(
+            hintStyle: TextStyle(
               fontSize: 16,
-              color: AppColors.placeholder,
+              color: context.placeholderColor,
             ),
             prefixIcon: Icon(
               icon,
               size: 20,
-              color: AppColors.placeholder,
+              color: context.placeholderColor,
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: AppColors.secondaryBackground,
+            fillColor: context.secondaryBg,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: context.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: context.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
