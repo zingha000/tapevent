@@ -14,6 +14,7 @@ class PasswordField extends StatelessWidget {
   final FocusNode? nextFocusNode;
   final TextInputAction textInputAction;
   final String? Function(String?)? validator;
+  final bool showStrengthIndicator;
 
   const PasswordField({
     super.key,
@@ -27,16 +28,13 @@ class PasswordField extends StatelessWidget {
     this.nextFocusNode,
     this.textInputAction = TextInputAction.next,
     this.validator,
+    this.showStrengthIndicator = true,
   });
 
   static PasswordStrength calculateStrength(String password) {
     if (password.isEmpty) return PasswordStrength.none;
-    int score = 0;
-    if (password.length >= 8) score++;
-    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
-    if (RegExp(r'[0-9]').hasMatch(password)) score++;
-    if (score <= 1) return PasswordStrength.weak;
-    if (score == 2) return PasswordStrength.medium;
+    if (password.length < 6) return PasswordStrength.weak;
+    if (password.length < 8) return PasswordStrength.medium;
     return PasswordStrength.strong;
   }
 
@@ -125,7 +123,7 @@ class PasswordField extends StatelessWidget {
                 ),
               ),
             ),
-            if (controller.text.isNotEmpty) ...[
+            if (showStrengthIndicator && controller.text.isNotEmpty) ...[
               const SizedBox(height: 8),
               _StrengthIndicator(strength: strength),
             ],

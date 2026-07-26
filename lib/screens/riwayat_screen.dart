@@ -158,46 +158,116 @@ class _HistoryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: context.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: context.shadowColor(0.05), blurRadius: 12, offset: const Offset(0, 5)),
+          BoxShadow(
+            color: const Color(0xFFF62440).withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: context.shadowColor(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          ),
         ],
       ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      event.title,
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.textPrimary),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Material(
+          color: context.surface,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => EventDetailScreen(event: event)));
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 100,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFF2DB), Color(0xFFE5BF), Color(0xFFFAF3)],
                     ),
-                    const SizedBox(height: 4),
-                    Text(event.organizerName, style: TextStyle(fontSize: 12, color: context.textSecondary)),
-                  ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: -15,
+                        right: -10,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary.withOpacity(0.08),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -8,
+                        left: -8,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary.withOpacity(0.06),
+                          ),
+                        ),
+                      ),
+                      if (event.bannerUrl != null)
+                        Image.network(event.bannerUrl!, fit: BoxFit.cover, width: double.infinity)
+                      else
+                        const Center(
+                          child: Icon(
+                            Icons.history_rounded,
+                            size: 32,
+                            color: Colors.white70,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.textPrimary),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(event.organizerName, style: TextStyle(fontSize: 12, color: context.textSecondary)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Selesai',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.green),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: const Text(
-                  'Selesai diikuti',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.green),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

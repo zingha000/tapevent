@@ -2,6 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/event.dart';
 import '../theme/app_colors.dart';
+import '../services/event_service.dart';
+import '../main.dart' show supabase;
+import 'event_manage_screen.dart';
 
 Future<Event?> showAccessCodeDialog(BuildContext context, Event event) {
   return showGeneralDialog<Event>(
@@ -49,7 +52,7 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     final input = _codeController.text.trim();
     if (input.isEmpty) {
       setState(() => _errorText = 'Kode akses wajib diisi');
@@ -59,7 +62,18 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
       setState(() => _errorText = 'Kode akses salah');
       return;
     }
-    Navigator.of(context).pop(widget.event);
+
+    final userId = supabase.auth.currentUser?.id;
+    if (userId != null) {
+      await EventService.recordOrganizerAccess(widget.event.id, userId);
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EventManageScreen(event: widget.event)),
+    );
   }
 
   @override

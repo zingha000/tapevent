@@ -6,6 +6,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
 import '../services/event_service.dart';
 import '../main.dart' show supabase;
+import 'qr_scan_screen.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final Event event;
@@ -306,6 +307,26 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       style: TextStyle(fontSize: 12, color: context.textSecondary),
                     ),
                   ),
+
+                  if (!_loadingRegistration && _myRegistration != null && _myRegistration!['cancellation_requested'] != true) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const QrScanScreen()));
+                        },
+                        icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 20),
+                        label: const Text('Scan Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
+                    ),
+                  ],
 
                   if (!_loadingRegistration && _myRegistration != null) ...[
                     const SizedBox(height: 12),

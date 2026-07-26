@@ -15,4 +15,15 @@ class ProfileService {
   static Future<void> updatePassword(String newPassword) async {
     await supabase.auth.updateUser(UserAttributes(password: newPassword));
   }
+  static Future<String> regenerateAccessCode(String eventId) async {
+    final newCode = _generateRandomCode();
+    await supabase.from('events').update({'access_code': newCode}).eq('id', eventId);
+    return newCode;
+  }
+
+  static String _generateRandomCode() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    final random = DateTime.now().microsecondsSinceEpoch;
+    return List.generate(6, (i) => chars[(random ~/ (i + 3)) % chars.length]).join();
+  }
 }

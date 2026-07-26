@@ -89,12 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         _emailController.text.trim().isNotEmpty &&
         _phoneController.text.trim().isNotEmpty &&
         _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty &&
-        _passwordController.text == _confirmPasswordController.text &&
-        _passwordController.text.length >= 8 &&
-        RegExp(r'[A-Z]').hasMatch(_passwordController.text) &&
-        RegExp(r'[0-9]').hasMatch(_passwordController.text) &&
-        _emailController.text.contains('@');
+        _confirmPasswordController.text.isNotEmpty;
   }
 
   void _onRoleChanged(UserRole role) {
@@ -272,12 +267,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                             if (v.length < 8) {
                               return 'Password minimal 8 karakter';
                             }
-                            if (!RegExp(r'[A-Z]').hasMatch(v)) {
-                              return 'Harus mengandung huruf besar';
-                            }
-                            if (!RegExp(r'[0-9]').hasMatch(v)) {
-                              return 'Harus mengandung angka';
-                            }
                             return null;
                           },
                         ),
@@ -307,7 +296,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                         PrimaryButton(
                           label: 'Daftar',
                           isLoading: _isLoading,
-                          isEnabled: _isFormValid,
                           onPressed: _submit,
                         ),
                         const SizedBox(height: 20),

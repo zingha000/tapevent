@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -21,12 +22,14 @@ class _EventManageScreenState extends State<EventManageScreen> {
   late final TextEditingController _docController;
   late final TextEditingController _certController;
   late Event _event;
+  late Future<List<Map<String, dynamic>>> _organizersFuture;
   bool _savingDoc = false;
   bool _savingCert = false;
   bool _showAccessCode = false;
   bool _uploadingCsv = false;
   late Future<List<Map<String, dynamic>>> _participantsFuture;
 
+  @override
   @override
   void initState() {
     super.initState();
@@ -38,6 +41,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       text: widget.event.certificateUrl ?? '',
     );
     _participantsFuture = EventService.fetchParticipants(_event.id);
+    _organizersFuture = EventService.fetchOrganizers(_event.id);
   }
 
   @override
@@ -85,7 +89,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
         return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12 * anim.value, sigmaY: 12 * anim.value),
+          filter: ImageFilter.blur(
+            sigmaX: 12 * anim.value,
+            sigmaY: 12 * anim.value,
+          ),
           child: FadeTransition(
             opacity: anim,
             child: ScaleTransition(
@@ -97,21 +104,38 @@ class _EventManageScreenState extends State<EventManageScreen> {
                   color: Colors.transparent,
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 32),
-                      padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.shadowColor(0.15),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                         Text('Hapus Event',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary)),
+                        Text(
+                          'Hapus Event',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: context.textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 6),
-                        Text('Tindakan ini tidak bisa dibatalkan. Jelaskan alasan penghapusan:',
-                            style: TextStyle(fontSize: 13, color: context.textSecondary)),
+                        Text(
+                          'Tindakan ini tidak bisa dibatalkan. Jelaskan alasan penghapusan:',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: context.textSecondary,
+                          ),
+                        ),
                         const SizedBox(height: 14),
                         TextField(
                           controller: reasonController,
@@ -123,11 +147,15 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.black.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.black.withOpacity(0.08),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.black.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.black.withOpacity(0.08),
+                              ),
                             ),
                           ),
                         ),
@@ -138,12 +166,23 @@ class _EventManageScreenState extends State<EventManageScreen> {
                               child: SizedBox(
                                 height: 46,
                                 child: OutlinedButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
                                   style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.black12),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    side: const BorderSide(
+                                      color: Colors.black12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
                                   ),
-                                  child: Text('Batal', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
+                                  child: Text(
+                                    'Batal',
+                                    style: TextStyle(
+                                      color: context.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -153,15 +192,24 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 height: 46,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (reasonController.text.trim().isEmpty) return;
+                                    if (reasonController.text.trim().isEmpty)
+                                      return;
                                     Navigator.of(context).pop(true);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                     elevation: 0,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
                                   ),
-                                  child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                  child: const Text(
+                                    'Hapus',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -182,15 +230,15 @@ class _EventManageScreenState extends State<EventManageScreen> {
       try {
         await EventService.deleteEvent(_event.id, reasonController.text.trim());
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Event berhasil dihapus')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Event berhasil dihapus')));
         Navigator.of(context).pop(true);
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal menghapus event')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Gagal menghapus event')));
       }
     }
   }
@@ -218,56 +266,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
               child: Center(
                 child: Material(
                   color: Colors.transparent,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 28),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: context.surface,
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.shadowColor(0.2),
-                          blurRadius: 30,
-                          offset: const Offset(0, 12),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'QR Absensi Event',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: context.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        QrImageView(
-                          data: widget.event.id,
-                          size: 270,
-                          backgroundColor: Colors.white,
-                        ),
-                        const SizedBox(height: 18),
-                        Text(
-                          'Tunjukkan QR ini ke peserta untuk absen',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: context.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Tutup'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: _QrDialogWidget(event: _event),
                 ),
               ),
             ),
@@ -354,7 +353,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
         return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12 * anim.value, sigmaY: 12 * anim.value),
+          filter: ImageFilter.blur(
+            sigmaX: 12 * anim.value,
+            sigmaY: 12 * anim.value,
+          ),
           child: FadeTransition(
             opacity: anim,
             child: ScaleTransition(
@@ -370,17 +372,34 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.shadowColor(0.15),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Hapus ${profile?['full_name'] ?? 'Peserta'}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary)),
+                        Text(
+                          'Hapus ${profile?['full_name'] ?? 'Peserta'}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: context.textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 6),
-                        Text('Jelaskan alasan penghapusan peserta ini:',
-                            style: TextStyle(fontSize: 13, color: context.textSecondary)),
+                        Text(
+                          'Jelaskan alasan penghapusan peserta ini:',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: context.textSecondary,
+                          ),
+                        ),
                         const SizedBox(height: 14),
                         TextField(
                           controller: reasonController,
@@ -392,11 +411,15 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.black.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.black.withOpacity(0.08),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.black.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.black.withOpacity(0.08),
+                              ),
                             ),
                           ),
                         ),
@@ -407,12 +430,23 @@ class _EventManageScreenState extends State<EventManageScreen> {
                               child: SizedBox(
                                 height: 46,
                                 child: OutlinedButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
                                   style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.black12),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    side: const BorderSide(
+                                      color: Colors.black12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
                                   ),
-                                   child: Text('Batal', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
+                                  child: Text(
+                                    'Batal',
+                                    style: TextStyle(
+                                      color: context.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -422,15 +456,24 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 height: 46,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (reasonController.text.trim().isEmpty) return;
+                                    if (reasonController.text.trim().isEmpty)
+                                      return;
                                     Navigator.of(context).pop(true);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                     elevation: 0,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
                                   ),
-                                  child: const Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                  child: const Text(
+                                    'Hapus',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -448,10 +491,17 @@ class _EventManageScreenState extends State<EventManageScreen> {
     );
 
     if (confirmed == true) {
-      await EventService.dropParticipant(participant['id'], reasonController.text.trim());
+      await EventService.dropParticipant(
+        participant['id'],
+        reasonController.text.trim(),
+      );
       if (!mounted) return;
-      setState(() => _participantsFuture = EventService.fetchParticipants(_event.id));
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Peserta berhasil dihapus')));
+      setState(
+        () => _participantsFuture = EventService.fetchParticipants(_event.id),
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Peserta berhasil dihapus')));
     }
   }
 
@@ -470,10 +520,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
           children: [
             Text(
               'Alasan dari peserta:',
-              style: TextStyle(
-                fontSize: 12,
-                color: context.textSecondary,
-              ),
+              style: TextStyle(fontSize: 12, color: context.textSecondary),
             ),
             const SizedBox(height: 6),
             Text(reason, style: const TextStyle(fontSize: 14)),
@@ -700,6 +747,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 4),
                   Text(
                     'Format: baris pertama header, kolom pertama = NIM/NIP',
@@ -726,9 +774,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           child: Center(
                             child: Text(
                               'Belum ada peserta terdaftar',
-                              style: TextStyle(
-                                color: context.textSecondary,
-                              ),
+                              style: TextStyle(color: context.textSecondary),
                             ),
                           ),
                         );
@@ -848,34 +894,174 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                             ),
                                     ),
                                     DataCell(
-                                    SizedBox(
-                                      width: 96,
-                                      height: 34,
-                                      child: cancellationRequested
-                                          ? OutlinedButton(
-                                              onPressed: () => _respondCancellation(p),
-                                              style: OutlinedButton.styleFrom(
-                                                side: const BorderSide(color: Colors.orange),
-                                                foregroundColor: Colors.orange,
-                                                padding: EdgeInsets.zero,
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      SizedBox(
+                                        width: 96,
+                                        height: 34,
+                                        child: cancellationRequested
+                                            ? OutlinedButton(
+                                                onPressed: () =>
+                                                    _respondCancellation(p),
+                                                style: OutlinedButton.styleFrom(
+                                                  side: const BorderSide(
+                                                    color: Colors.orange,
+                                                  ),
+                                                  foregroundColor:
+                                                      Colors.orange,
+                                                  padding: EdgeInsets.zero,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  'Tanggapi',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              )
+                                            : OutlinedButton(
+                                                onPressed: () =>
+                                                    _dropParticipant(p),
+                                                style: OutlinedButton.styleFrom(
+                                                  side: const BorderSide(
+                                                    color: Colors.red,
+                                                  ),
+                                                  foregroundColor: Colors.red,
+                                                  padding: EdgeInsets.zero,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  'Hapus',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
                                               ),
-                                              child: const Text('Tanggapi', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                            )
-                                          : OutlinedButton(
-                                              onPressed: () => _dropParticipant(p),
-                                              style: OutlinedButton.styleFrom(
-                                                side: const BorderSide(color: Colors.red),
-                                                foregroundColor: Colors.red,
-                                                padding: EdgeInsets.zero,
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                              ),
-                                              child: const Text('Hapus', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                            ),
+                                      ),
                                     ),
-                                  ),
                                   ],
                                 );
+                              }),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 28),
+                  const Divider(),
+                  const SizedBox(height: 12),
+
+                  Text('Daftar Akses Kelola Event',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.textPrimary)),
+                  const SizedBox(height: 4),
+                  Text('Semua orang yang pernah masuk lewat kode akses',
+                      style: TextStyle(fontSize: 11, color: context.textSecondary)),
+                  const SizedBox(height: 12),
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _organizersFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      final organizers = snapshot.data ?? [];
+                      if (organizers.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Text('Belum ada yang masuk', style: TextStyle(color: context.textSecondary)),
+                        );
+                      }
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black.withOpacity(0.08)),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minWidth: 480),
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.all(context.bg),
+                              dataRowMinHeight: 48,
+                              dataRowMaxHeight: 56,
+                              columnSpacing: 20,
+                              horizontalMargin: 16,
+                              headingTextStyle: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: context.textPrimary,
+                              ),
+                              dataTextStyle: TextStyle(
+                                fontSize: 13,
+                                color: context.textPrimary,
+                              ),
+                              columns: const [
+                                DataColumn(label: Text('No')),
+                                DataColumn(label: Text('Nama')),
+                                DataColumn(label: Text('Email')),
+                                DataColumn(label: Text('Peran')),
+                              ],
+                              rows: List.generate(organizers.length, (index) {
+                                final o = organizers[index];
+                                final profile = o['profiles'] as Map<String, dynamic>?;
+                                final isCreator = profile != null && o['user_id'] == _event.createdBy;
+                                return DataRow(cells: [
+                                  DataCell(Text('${index + 1}')),
+                                  DataCell(
+                                    SizedBox(
+                                      width: 140,
+                                      child: Text(
+                                        profile?['full_name'] ?? '-',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        profile?['email'] ?? '-',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: isCreator
+                                            ? AppColors.primary.withOpacity(0.1)
+                                            : Colors.blue.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        isCreator ? 'Pembuat' : 'Co-Panitia',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: isCreator ? AppColors.primary : Colors.blue,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ]);
                               }),
                             ),
                           ),
@@ -961,8 +1147,58 @@ class _EventManageScreenState extends State<EventManageScreen> {
                               width: double.infinity,
                               height: 42,
                               child: OutlinedButton(
-                                onPressed: () {
-                                  // TODO: generate kode akses baru, update ke Supabase
+                                onPressed: () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      title: const Text(
+                                        'Buat Kode Akses Baru?',
+                                      ),
+                                      content: const Text(
+                                        'Kode lama tidak akan berlaku lagi. Semua orang (termasuk kamu) perlu kode baru ini untuk masuk lagi.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: const Text('Batal'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: const Text(
+                                            'Buat Baru',
+                                            style: TextStyle(
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  if (confirmed == true) {
+                                    final newCode =
+                                        await EventService.regenerateAccessCode(
+                                          _event.id,
+                                        );
+                                    if (!mounted) return;
+                                    setState(() {
+                                      _event = _event.copyWith(
+                                        accessCode: newCode,
+                                      );
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Kode akses baru: $newCode',
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(
@@ -1100,6 +1336,151 @@ class _LinkSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _QrDialogWidget extends StatefulWidget {
+  final Event event;
+  const _QrDialogWidget({required this.event});
+
+  @override
+  State<_QrDialogWidget> createState() => _QrDialogWidgetState();
+}
+
+class _QrDialogWidgetState extends State<_QrDialogWidget> {
+  Timer? _timer;
+  late String _qrData;
+  int _secondsLeft = 5;
+  late final bool _hasQrSecret;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasQrSecret = widget.event.qrSecret != null;
+
+    if (_hasQrSecret) {
+      _qrData = EventService.generateQrData(widget.event.id, widget.event.qrSecret!);
+      _secondsLeft = 5 - (DateTime.now().millisecondsSinceEpoch ~/ 1000) % 5;
+      if (_secondsLeft <= 0) _secondsLeft = 5;
+
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted) return;
+        final msLeft = EventService.msUntilNextRefresh();
+        final secLeft = (msLeft ~/ 1000) + 1;
+
+        if (secLeft != _secondsLeft || msLeft < 100) {
+          setState(() {
+            _secondsLeft = secLeft;
+            _qrData = EventService.generateQrData(
+              widget.event.id,
+              widget.event.qrSecret!,
+            );
+          });
+        } else {
+          setState(() => _secondsLeft = secLeft);
+        }
+      });
+    } else {
+      _qrData = widget.event.id;
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StatefulBuilder(
+      builder: (context, setDialogState) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 28),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 30,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'QR Absensi Event',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 14),
+              QrImageView(
+                data: _qrData,
+                size: 250,
+                backgroundColor: Colors.white,
+              ),
+              const SizedBox(height: 12),
+              if (_hasQrSecret)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        value: _secondsLeft / 5,
+                        color: AppColors.primary,
+                        backgroundColor: AppColors.primary.withOpacity(0.15),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  Text(
+                    'Refresh dalam $_secondsLeft detik',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    'Refresh dalam $_secondsLeft detik',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tunjukkan QR ini ke peserta untuk absen',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Tutup'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

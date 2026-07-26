@@ -16,11 +16,19 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late Future<List<Event>> _eventsFuture;
+  final _searchController = TextEditingController();
+  String _query = '';
 
   @override
   void initState() {
     super.initState();
     _loadEvents();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _loadEvents() {
@@ -44,14 +52,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onRefresh: _refresh,
           child: CustomScrollView(
             slivers: [
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: ScreenHeader(
                   title: 'Dashboard',
                   subtitle: 'Event yang kamu buat atau kelola',
+                  child: Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 14),
+                        Icon(Icons.search_rounded, color: Colors.grey.shade500, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (v) => setState(() => _query = v.toLowerCase()),
+                            style: const TextStyle(fontSize: 14, color: Color(0xFF1D1D1D)),
+                            decoration: InputDecoration(
+                              hintText: 'Cari event...',
+                              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                              border: InputBorder.none,
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                 sliver: FutureBuilder<List<Event>>(
                   future: _eventsFuture,
                   builder: (context, snapshot) {
@@ -63,14 +98,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       );
                     }
-                    final events = snapshot.data ?? [];
+                    final allEvents = snapshot.data ?? [];
+                    final events = allEvents.where((e) {
+                      if (_query.isEmpty) return true;
+                      return e.title.toLowerCase().contains(_query) ||
+                          e.organizerName.toLowerCase().contains(_query) ||
+                          (e.category ?? '').toLowerCase().contains(_query);
+                    }).toList();
                     if (events.isEmpty) {
                       return SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 60),
                           child: Center(
                             child: Text(
-                              'Kamu belum membuat event apapun',
+                              allEvents.isEmpty
+                                  ? 'Kamu belum membuat event apapun'
+                                  : 'Tidak ada event yang cocok',
                               style: TextStyle(
                                 color: context.textSecondary,
                               ),

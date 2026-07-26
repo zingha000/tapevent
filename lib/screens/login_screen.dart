@@ -145,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           focusNode: _passwordFocus,
                           textInputAction: TextInputAction.done,
+                          showStrengthIndicator: false,
                           validator: (v) {
                             if (v == null || v.isEmpty) {
                               return 'Password wajib diisi';

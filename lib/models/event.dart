@@ -16,6 +16,8 @@ class Event {
   final String? certificateUrl;
   final String createdBy;
   final String? rejectionReason;
+  final String? qrSecret;
+  final String? proofDocumentUrl;
 
   Event({
     required this.id,
@@ -35,6 +37,8 @@ class Event {
     this.certificateUrl,
     required this.createdBy,
     this.rejectionReason,
+    this.qrSecret,
+    this.proofDocumentUrl,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -56,6 +60,8 @@ class Event {
       certificateUrl: json['certificate_url'],
       createdBy: json['created_by'],
       rejectionReason: json['rejection_reason'],
+      qrSecret: json['qr_secret'],
+      proofDocumentUrl: json['proof_document_url'],
     );
   }
   Event copyWith({
@@ -65,6 +71,8 @@ class Event {
     String? bannerUrl,
     String? organizerName,
     String? contactPerson,
+    String? accessCode,
+    String? qrSecret,
   }) {
     return Event(
       id: id,
@@ -78,12 +86,14 @@ class Event {
       organizerName: organizerName ?? this.organizerName,
       contactPerson: contactPerson ?? this.contactPerson,
       registrationFormUrl: registrationFormUrl,
-      accessCode: accessCode,
+      accessCode: accessCode ?? this.accessCode,
       status: status,
       documentationUrl: documentationUrl,
       certificateUrl: certificateUrl,
       createdBy: createdBy,
       rejectionReason: rejectionReason,
+      qrSecret: qrSecret ?? this.qrSecret,
+      proofDocumentUrl: proofDocumentUrl,
     );
   }
 }
