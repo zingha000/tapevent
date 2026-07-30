@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
@@ -9,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../main.dart' show supabase;
 import 'event_edit_screen.dart';
 import '../services/event_service.dart';
+import '../widgets/lottie_loading.dart';
 
 class EventManageScreen extends StatefulWidget {
   final Event event;
@@ -25,7 +27,6 @@ class _EventManageScreenState extends State<EventManageScreen> {
   late Future<List<Map<String, dynamic>>> _organizersFuture;
   bool _savingDoc = false;
   bool _savingCert = false;
-  bool _showAccessCode = false;
   bool _uploadingCsv = false;
   late Future<List<Map<String, dynamic>>> _participantsFuture;
 
@@ -42,6 +43,23 @@ class _EventManageScreenState extends State<EventManageScreen> {
     );
     _participantsFuture = EventService.fetchParticipants(_event.id);
     _organizersFuture = EventService.fetchOrganizers(_event.id);
+    _autoCompleteIfExpired();
+  }
+
+  Future<void> _autoCompleteIfExpired() async {
+    if (_event.status != 'active' || _event.endDate == null) return;
+    if (_event.endDate!.isAfter(DateTime.now())) return;
+    try {
+      await EventService.completeEvent(_event.id);
+      if (!mounted) return;
+      final completed = _event.copyWith(status: 'completed');
+      setState(() => _event = completed);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Event otomatis ditandai selesai karena sudah lewat tanggal')),
+      );
+    } catch (e) {
+      debugPrint('Auto-complete failed: $e');
+    }
   }
 
   @override
@@ -74,6 +92,146 @@ class _EventManageScreenState extends State<EventManageScreen> {
       );
     } finally {
       if (mounted) setLoading(false);
+    }
+  }
+
+  Future<void> _confirmComplete() async {
+    final confirmed = await showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Akhiri Event',
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 12 * anim.value,
+            sigmaY: 12 * anim.value,
+          ),
+          child: FadeTransition(
+            opacity: anim,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+                CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+              ),
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.shadowColor(0.15),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Akhiri Event',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: context.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Event akan ditandai sebagai selesai. Peserta tidak akan lagi melihat event ini di beranda.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: context.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 46,
+                                child: OutlinedButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: Colors.black12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Batal',
+                                    style: TextStyle(
+                                      color: context.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: SizedBox(
+                                height: 46,
+                                child: ElevatedButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.success,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Akhiri',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        await EventService.completeEvent(_event.id);
+        if (!mounted) return;
+        final completed = _event.copyWith(status: 'completed');
+        setState(() => _event = completed);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Event berhasil diselesaikan')));
+        Navigator.of(context).pop(completed);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal menyelesaikan event, coba lagi')),
+        );
+      }
     }
   }
 
@@ -147,15 +305,11 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.black.withOpacity(0.08),
-                              ),
+                              borderSide: BorderSide(color: AppColors.border),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.black.withOpacity(0.08),
-                              ),
+                              borderSide: BorderSide(color: AppColors.border),
                             ),
                           ),
                         ),
@@ -241,6 +395,371 @@ class _EventManageScreenState extends State<EventManageScreen> {
         ).showSnackBar(const SnackBar(content: Text('Gagal menghapus event')));
       }
     }
+  }
+
+  void _showAccessCodePopup() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Ganti Kode Akses',
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12 * anim.value, sigmaY: 12 * anim.value),
+          child: FadeTransition(
+            opacity: anim,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+                CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+              ),
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Icon(Icons.vpn_key_rounded, color: AppColors.primary, size: 28),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Ganti Kode Akses',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.info_outline_rounded, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Kode akses hanya perlu diketahui oleh penyelenggara. Jika ada orang luar yang mengetahuinya, segera buat kode baru.',
+                                  style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _confirmRegenerateAccessCode();
+                            },
+                            icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+                            label: const Text('Buat Kode Baru', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 44,
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: AppColors.border),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: Text('Tutup', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _confirmRegenerateAccessCode() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Buat Kode Akses Baru?'),
+        content: const Text('Kode lama tidak akan berlaku lagi. Semua orang (termasuk kamu) perlu kode baru ini untuk masuk lagi.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Batal')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Buat Baru', style: TextStyle(color: AppColors.primary)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      final newCode = await EventService.regenerateAccessCode(_event.id);
+      if (mounted) {
+        setState(() => _event = _event.copyWith(accessCode: newCode));
+        _showNewCodePopup(newCode);
+      }
+    }
+  }
+
+  void _showNewCodePopup(String newCode) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'Kode Baru',
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12 * anim.value, sigmaY: 12 * anim.value),
+          child: FadeTransition(
+            opacity: anim,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+                CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+              ),
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Icon(Icons.check_rounded, color: AppColors.success, size: 28),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Kode Akses Baru',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.warning_amber_rounded, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Kode ini hanya ditampilkan sekali. Salin sekarang, setelah ini tidak bisa dilihat lagi.',
+                                  style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: context.bg,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.success.withOpacity(0.3)),
+                          ),
+                          child: Text(
+                            newCode.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 24, letterSpacing: 4, fontWeight: FontWeight.w800, color: AppColors.primary),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: newCode));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Kode akses disalin')),
+                              );
+                            },
+                            icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
+                            label: const Text('Salin Kode', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.primary),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: const Text('Tutup', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAksiPopup() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Aksi',
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12 * anim.value, sigmaY: 12 * anim.value),
+          child: FadeTransition(
+            opacity: anim,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+                CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+              ),
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Icon(Icons.more_horiz_rounded, color: AppColors.primary, size: 28),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Aksi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 6),
+                        Text('Pilih tindakan untuk event ini',
+                            style: TextStyle(fontSize: 13, color: context.textSecondary)),
+                        const SizedBox(height: 20),
+                        if (_event.status == 'active')
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                _confirmComplete();
+                              },
+                              icon: const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 20),
+                              label: const Text('Akhiri Event', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.success,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                            ),
+                          ),
+                        if (_event.status == 'active') const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _confirmDelete();
+                            },
+                            icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 20),
+                            label: const Text('Hapus Event', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.red),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: const Text('Tutup', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showQrDialog() {
@@ -411,15 +930,11 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.black.withOpacity(0.08),
-                              ),
+                              borderSide: BorderSide(color: AppColors.border),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.black.withOpacity(0.08),
-                              ),
+                              borderSide: BorderSide(color: AppColors.border),
                             ),
                           ),
                         ),
@@ -577,26 +1092,29 @@ class _EventManageScreenState extends State<EventManageScreen> {
       child: Scaffold(
         backgroundColor: context.bg,
         appBar: AppBar(
-          title: Text(_event.title, overflow: TextOverflow.ellipsis),
+          automaticallyImplyLeading: false,
+          title: const Text('Kelola Event', overflow: TextOverflow.ellipsis),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
         ),
         body: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Container(
-              width: double.infinity,
-              height: 160,
-              color: AppColors.sand,
-              child: _event.bannerUrl != null
-                  ? Image.network(_event.bannerUrl!, fit: BoxFit.cover)
-                  : const Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        size: 36,
-                        color: Colors.white70,
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Container(
+                width: double.infinity,
+                color: AppColors.sand,
+                child: _event.bannerUrl != null
+                    ? Image.network(_event.bannerUrl!, fit: BoxFit.cover)
+                    : const Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 36,
+                          color: Colors.white70,
+                        ),
                       ),
-                    ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(20),
@@ -764,7 +1282,9 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: SizedBox(width: 80, height: 80, child: LottieLoading()),
+                          ),
                         );
                       }
                       final participants = snapshot.data ?? [];
@@ -975,7 +1495,9 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: SizedBox(width: 80, height: 80, child: LottieLoading()),
+                          ),
                         );
                       }
                       final organizers = snapshot.data ?? [];
@@ -1070,181 +1592,40 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 28),
-                  const Divider(),
-                  const SizedBox(height: 12),
-
-                  InkWell(
-                    onTap: () =>
-                        setState(() => _showAccessCode = !_showAccessCode),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.vpn_key_outlined,
-                            size: 18,
-                            color: context.textPrimary,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Ganti Kode Akses',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: context.textPrimary,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            _showAccessCode
-                                ? Icons.expand_less_rounded
-                                : Icons.expand_more_rounded,
-                            color: context.textSecondary,
-                          ),
-                        ],
-                      ),
-                    ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    onTap: () => _showAccessCodePopup(),
+                    leading: Icon(Icons.vpn_key_outlined, color: context.textPrimary, size: 22),
+                    title: const Text('Ganti Kode Akses', style: TextStyle(fontSize: 14)),
+                    trailing: Icon(Icons.chevron_right_rounded, color: context.textSecondary),
                   ),
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 200),
-                    crossFadeState: _showAccessCode
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    firstChild: const SizedBox.shrink(),
-                    secondChild: Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: context.surface,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Kode Akses Saat Ini',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: context.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _event.accessCode,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 2,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 42,
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  final confirmed = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      title: const Text(
-                                        'Buat Kode Akses Baru?',
-                                      ),
-                                      content: const Text(
-                                        'Kode lama tidak akan berlaku lagi. Semua orang (termasuk kamu) perlu kode baru ini untuk masuk lagi.',
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(false),
-                                          child: const Text('Batal'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(true),
-                                          child: const Text(
-                                            'Buat Baru',
-                                            style: TextStyle(
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-
-                                  if (confirmed == true) {
-                                    final newCode =
-                                        await EventService.regenerateAccessCode(
-                                          _event.id,
-                                        );
-                                    if (!mounted) return;
-                                    setState(() {
-                                      _event = _event.copyWith(
-                                        accessCode: newCode,
-                                      );
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Kode akses baru: $newCode',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(
-                                    color: AppColors.primary,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Buat Kode Baru',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  const Divider(height: 1, indent: 56, endIndent: 20),
+                  ListTile(
+                    onTap: () => _showAksiPopup(),
+                    leading: Icon(Icons.more_horiz_rounded, color: context.textPrimary, size: 22),
+                    title: const Text('Aksi', style: TextStyle(fontSize: 14)),
+                    trailing: Icon(Icons.chevron_right_rounded, color: context.textSecondary),
                   ),
-
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: OutlinedButton.icon(
-                      onPressed: _confirmDelete,
+                      onPressed: () => Navigator.of(context).pop(_event),
                       icon: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: Colors.red,
+                        Icons.logout_rounded,
+                        color: AppColors.primary,
                         size: 20,
                       ),
                       label: const Text(
-                        'Hapus Event',
+                        'Keluar dari Kelola Event',
                         style: TextStyle(
-                          color: Colors.red,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
+                        side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -1300,7 +1681,15 @@ class _LinkSection extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: AppColors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
             ),
           ),
         ),

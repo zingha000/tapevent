@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../theme/app_colors.dart';
 import '../services/event_service.dart';
 import '../main.dart' show supabase;
+import '../widgets/lottie_loading.dart';
 
 class QrScanScreen extends StatefulWidget {
   const QrScanScreen({super.key});
@@ -11,7 +13,7 @@ class QrScanScreen extends StatefulWidget {
   State<QrScanScreen> createState() => _QrScanScreenState();
 }
 
-class _QrScanScreenState extends State<QrScanScreen> {
+class _QrScanScreenState extends State<QrScanScreen> with TickerProviderStateMixin {
   bool _processing = false;
   final MobileScannerController _controller = MobileScannerController();
 
@@ -62,6 +64,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   void _showResult(bool success, String message) {
     if (!mounted) return;
+    final controller = AnimationController(vsync: this);
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -70,10 +73,22 @@ class _QrScanScreenState extends State<QrScanScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              success ? Icons.check_circle_rounded : Icons.cancel_rounded,
-              color: success ? Colors.green : Colors.red,
-              size: 56,
+            SizedBox(
+              width: 150,
+              height: 150,
+              child: Lottie.asset(
+                success
+                    ? 'assets/animations/success_check.json'
+                    : 'assets/animations/failed_check.json',
+                controller: controller,
+                onLoaded: (composition) {
+                  controller
+                    ..duration = composition.duration
+                    ..forward().then((_) {
+                      if (mounted) Navigator.of(context).pop();
+                    });
+                },
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -83,20 +98,8 @@ class _QrScanScreenState extends State<QrScanScreen> {
             ),
           ],
         ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Selesai'),
-            ),
-          ),
-        ],
       ),
-    );
+    ).then((_) => controller.dispose());
   }
 
   @override
@@ -117,7 +120,9 @@ class _QrScanScreenState extends State<QrScanScreen> {
           if (_processing)
             Container(
               color: Colors.black54,
-              child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+              child: const Center(
+                child: SizedBox(width: 120, height: 120, child: LottieLoading()),
+              ),
             ),
           Center(
             child: Container(

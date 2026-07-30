@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../services/event_service.dart';
 import '../main.dart' show supabase;
 import 'admin_approval_history_screen.dart';
+import '../widgets/lottie_loading.dart';
 
 class AdminApprovalScreen extends StatefulWidget {
   const AdminApprovalScreen({super.key});
@@ -29,12 +30,19 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
   Future<void> _approve(Event event) async {
     final adminId = supabase.auth.currentUser?.id;
     if (adminId == null) return;
-    await EventService.approveEvent(event.id, adminId);
-    if (!mounted) return;
-    setState(_load);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${event.title} disetujui')),
-    );
+    try {
+      await EventService.approveEvent(event.id, adminId);
+      if (!mounted) return;
+      setState(_load);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${event.title} disetujui')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyetujui: $e')),
+      );
+    }
   }
 
   Future<void> _reject(Event event) async {
@@ -145,28 +153,200 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
     if (confirmed == true) {
       final adminId = supabase.auth.currentUser?.id;
       if (adminId == null) return;
-      await EventService.rejectEvent(event.id, adminId, reasonController.text.trim());
-      if (!mounted) return;
-      setState(_load);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${event.title} ditolak')),
-      );
+      try {
+        await EventService.rejectEvent(event.id, adminId, reasonController.text.trim());
+        if (!mounted) return;
+        setState(_load);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${event.title} ditolak')),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menolak: $e')),
+        );
+      }
     }
   }
 
-  void _viewProof(String? url) {
-    if (url == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bukti tidak tersedia')),
-      );
-      return;
-    }
-    showDialog(
+  void _showDetailDialog(Event event) {
+    showGeneralDialog(
       context: context,
-      builder: (context) => Dialog(
-        child: Image.network(url, fit: BoxFit.contain),
+      barrierDismissible: true,
+      barrierLabel: 'Detail Pengajuan',
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim, secondaryAnim, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12 * anim.value, sigmaY: 12 * anim.value),
+          child: FadeTransition(
+            opacity: anim,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+                CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+              ),
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 28),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(event.title,
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary)),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Icon(Icons.close_rounded, color: context.textSecondary),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(event.organizerName, style: TextStyle(fontSize: 13, color: context.textSecondary)),
+                        const SizedBox(height: 16),
+                        Text('Bukti Pengesahan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary)),
+                        const SizedBox(height: 8),
+                        if (event.proofDocumentUrl != null)
+                          GestureDetector(
+                            onTap: () => _showFullScreenImage(event.proofDocumentUrl!),
+                            child: Container(
+                              height: 220,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: context.secondaryBg,
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.network(event.proofDocumentUrl!, fit: BoxFit.contain),
+                                  Positioned(
+                                    bottom: 8,
+                                    right: 8,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.fullscreen, size: 14, color: Colors.white),
+                                          SizedBox(width: 4),
+                                          Text('Perbesar', style: TextStyle(fontSize: 11, color: Colors.white)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            height: 80,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: context.secondaryBg,
+                            ),
+                            child: Center(child: Text('Bukti tidak tersedia', style: TextStyle(color: context.textSecondary))),
+                          ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 46,
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _reject(event);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Colors.red),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  ),
+                                  child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: SizedBox(
+                                height: 46,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _approve(event);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF22C55E),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  ),
+                                  child: const Text('Setujui', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFullScreenImage(String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4,
+              child: Image.network(url, fit: BoxFit.contain),
+            ),
+          ),
+        ),
       ),
     );
+  }
+
+  String _formatDateRange(DateTime start, DateTime? end) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    if (end == null) return '${start.day} ${months[start.month - 1]} ${start.year}';
+    if (start.month == end.month && start.year == end.year) {
+      return '${start.day}-${end.day} ${months[start.month - 1]} ${start.year}';
+    }
+    return '${start.day} ${months[start.month - 1]} - ${end.day} ${months[end.month - 1]} ${end.year}';
   }
 
   @override
@@ -228,12 +408,21 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
               future: _pendingFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: SizedBox(width: 100, height: 100, child: LottieLoading()),
+                  );
                 }
                 final events = snapshot.data ?? [];
                 if (events.isEmpty) {
                   return Center(
-                    child: Text('Tidak ada event yang menunggu persetujuan', style: TextStyle(color: context.textSecondary)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.checklist_rounded, size: 40, color: context.textSecondary),
+                        const SizedBox(height: 10),
+                        Text('Tidak ada event yang menunggu persetujuan', style: TextStyle(color: context.textSecondary)),
+                      ],
+                    ),
                   );
                 }
                 return ListView.builder(
@@ -243,76 +432,64 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                     final event = events[index];
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: context.surface,
                         borderRadius: BorderRadius.circular(18),
-                        boxShadow: [BoxShadow(color: context.shadowColor(0.06), blurRadius: 14, offset: const Offset(0, 6))],
+                        border: Border.all(color: AppColors.border),
+                        boxShadow: [BoxShadow(color: context.shadowColor(0.1), blurRadius: 16, offset: const Offset(0, 4))],
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            height: 110,
-                            width: double.infinity,
-                            color: AppColors.sand,
-                            child: event.bannerUrl != null
-                                ? Image.network(event.bannerUrl!, fit: BoxFit.cover)
-                                : const Center(child: Icon(Icons.image_outlined, size: 28, color: Colors.white70)),
+                          if (event.bannerUrl != null)
+                            Container(
+                              height: 120,
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: context.secondaryBg,
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Image.network(event.bannerUrl!, fit: BoxFit.cover),
+                            ),
+                          Text(event.title,
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: context.textPrimary)),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(Icons.person_outline, size: 14, color: context.textSecondary),
+                              const SizedBox(width: 6),
+                              Text(event.organizerName,
+                                  style: TextStyle(fontSize: 13, color: context.textSecondary)),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(14),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(event.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.textPrimary)),
-                                const SizedBox(height: 4),
-                                Text(event.organizerName, style: TextStyle(fontSize: 12, color: context.textSecondary)),
-                                Text(
-                                  '${event.startDate.day}/${event.startDate.month}/${event.startDate.year}',
-                                  style: TextStyle(fontSize: 12, color: context.textSecondary),
-                                ),
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => _viewProof(event.proofDocumentUrl),
-                                    icon: Icon(Icons.description_outlined, size: 16, color: AppColors.primary),
-                                    label: const Text('Lihat Bukti', style: TextStyle(color: AppColors.primary)),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: AppColors.primary),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () => _reject(event),
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: Colors.red),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                        ),
-                                        child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: () => _approve(event),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                        ),
-                                        child: const Text('Setujui', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_today_rounded, size: 14, color: context.textSecondary),
+                              const SizedBox(width: 6),
+                              Text(
+                                _formatDateRange(event.startDate, event.endDate),
+                                style: TextStyle(fontSize: 13, color: context.textSecondary),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 42,
+                            child: ElevatedButton(
+                              onPressed: () => _showDetailDialog(event),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Text('Lihat Pengajuan',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
                             ),
                           ),
                         ],

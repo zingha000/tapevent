@@ -18,6 +18,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _taglineController;
   late final TextEditingController _descriptionController;
+  late final TextEditingController _locationController;
   late final TextEditingController _organizerController;
   late final TextEditingController _contactController;
 
@@ -34,6 +35,9 @@ class _EventEditScreenState extends State<EventEditScreen> {
     _descriptionController = TextEditingController(
       text: widget.event.description ?? '',
     );
+    _locationController = TextEditingController(
+      text: widget.event.location ?? '',
+    );
     _organizerController = TextEditingController(
       text: widget.event.organizerName,
     );
@@ -47,6 +51,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
     _titleController.dispose();
     _taglineController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     _organizerController.dispose();
     _contactController.dispose();
     super.dispose();
@@ -93,6 +98,9 @@ class _EventEditScreenState extends State<EventEditScreen> {
         'description': _descriptionController.text.trim().isEmpty
             ? null
             : _descriptionController.text.trim(),
+        'location': _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
         'organizer_name': _organizerController.text.trim(),
         'contact_person': _contactController.text.trim().isEmpty
             ? null
@@ -116,6 +124,9 @@ class _EventEditScreenState extends State<EventEditScreen> {
         contactPerson: _contactController.text.trim().isEmpty
             ? null
             : _contactController.text.trim(),
+        location: _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
         bannerUrl: bannerUrl,
       );
       Navigator.of(context).pop(updatedEvent);
@@ -207,6 +218,13 @@ class _EventEditScreenState extends State<EventEditScreen> {
           ),
           const SizedBox(height: 16),
 
+          _Label('Lokasi'),
+          TextField(
+            controller: _locationController,
+            decoration: _decoration('Lokasi event'),
+          ),
+          const SizedBox(height: 16),
+
           _Label('Nama Organisasi/Ormawa'),
           TextField(
             controller: _organizerController,
@@ -259,12 +277,25 @@ class _EventEditScreenState extends State<EventEditScreen> {
   InputDecoration _decoration(String hint) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: TextStyle(color: context.textSecondary, fontSize: 14),
       filled: true,
       fillColor: context.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: AppColors.border, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.border, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.error, width: 1),
       ),
     );
   }

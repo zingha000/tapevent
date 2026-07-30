@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../theme/app_colors.dart';
 import '../../widgets/register/header_section.dart';
 import '../../widgets/register/role_selector.dart';
@@ -19,7 +20,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   UserRole _role = UserRole.mahasiswa;
   bool _isLoading = false;
@@ -120,10 +121,49 @@ class _RegisterScreenState extends State<RegisterScreen>
 
       if (response.user != null) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pendaftaran berhasil, silakan login')),
+        final lottieController = AnimationController(vsync: this);
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 180,
+                  height: 180,
+                  child: Lottie.asset(
+                    'assets/animations/register.json',
+                    controller: lottieController,
+                    onLoaded: (composition) {
+                      lottieController
+                        ..duration = composition.duration
+                        ..forward().then((_) {
+                          if (mounted) Navigator.of(ctx).pop();
+                        });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Pendaftaran Berhasil!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Silakan login dengan akun kamu',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
         );
-        Navigator.of(context).pop(); // kembali ke halaman Login
+        lottieController.dispose();
+        if (!mounted) return;
+        Navigator.of(context).pop();
       }
     } on AuthException catch (e) {
       if (!mounted) return;
@@ -162,11 +202,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                       children: [
                         const HeaderSection(),
                         const SizedBox(height: 32),
-                        RoleSelector(
-                          selectedRole: _role,
-                          onRoleChanged: _onRoleChanged,
-                        ),
-                        const SizedBox(height: 24),
                         AppTextField(
                           controller: _nameController,
                           label: 'Nama Lengkap',
@@ -183,6 +218,11 @@ class _RegisterScreenState extends State<RegisterScreen>
                           },
                         ),
                         const SizedBox(height: 16),
+                        RoleSelector(
+                          selectedRole: _role,
+                          onRoleChanged: _onRoleChanged,
+                        ),
+                        const SizedBox(height: 24),
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
                           switchInCurve: Curves.easeIn,
@@ -207,7 +247,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         const SizedBox(height: 16),
                         AppTextField(
                           controller: _emailController,
-                          label: 'Email Kampus',
+                          label: 'Email',
                           hint: 'nama@email.com',
                           icon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,

@@ -18,12 +18,15 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   final _titleController = TextEditingController();
   final _taglineController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _locationController = TextEditingController();
   final _organizerController = TextEditingController();
   final _contactController = TextEditingController();
   final _formUrlController = TextEditingController();
 
   String? _category;
   DateTime? _startDate;
+  DateTime? _endDate;
+  final _maxParticipantsController = TextEditingController();
   bool _isSaving = false;
 
   Uint8List? _bannerBytes;
@@ -45,20 +48,85 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     _titleController.dispose();
     _taglineController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     _organizerController.dispose();
     _contactController.dispose();
     _formUrlController.dispose();
+    _maxParticipantsController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
+  Future<void> _pickStartDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().add(const Duration(days: 1)),
+      initialDate: _startDate ?? DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          datePickerTheme: DatePickerThemeData(
+            todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
+            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withOpacity(0.1)),
+            dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return AppColors.primary;
+              return null;
+            }),
+            rangeSelectionBackgroundColor: AppColors.primary.withOpacity(0.1),
+            headerBackgroundColor: AppColors.primary,
+            headerForegroundColor: Colors.white,
+            dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return Colors.white;
+              return null;
+            }),
+          ),
+        ),
+        child: child!,
+      ),
     );
-    if (picked != null) setState(() => _startDate = picked);
+    if (picked != null) {
+      setState(() {
+        _startDate = picked;
+        if (_endDate != null && _endDate!.isBefore(picked)) {
+          _endDate = null;
+        }
+      });
+    }
+  }
+
+  Future<void> _pickEndDate() async {
+    if (_startDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tanggal mulai harus dipilih terlebih dahulu')),
+      );
+      return;
+    }
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate!.add(const Duration(days: 1)),
+      firstDate: _startDate!,
+      lastDate: _startDate!.add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          datePickerTheme: DatePickerThemeData(
+            todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
+            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withOpacity(0.1)),
+            dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return AppColors.primary;
+              return null;
+            }),
+            rangeSelectionBackgroundColor: AppColors.primary.withOpacity(0.1),
+            headerBackgroundColor: AppColors.primary,
+            headerForegroundColor: Colors.white,
+            dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return Colors.white;
+              return null;
+            }),
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _endDate = picked);
   }
 
   Future<void> _pickBanner() async {
@@ -108,7 +176,13 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_startDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tanggal event wajib dipilih')),
+        const SnackBar(content: Text('Tanggal mulai event wajib dipilih')),
+      );
+      return;
+    }
+    if (_endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tanggal berakhir event wajib dipilih')),
       );
       return;
     }
@@ -138,6 +212,13 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         bannerUrl: bannerUrl,
         category: _category,
         startDate: _startDate!,
+        endDate: _endDate,
+        maxParticipants: _maxParticipantsController.text.trim().isEmpty
+            ? null
+            : int.tryParse(_maxParticipantsController.text.trim()),
+        location: _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
         organizerName: _organizerController.text.trim(),
         contactPerson: _contactController.text.trim().isEmpty
             ? null
@@ -159,7 +240,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal membuat event, coba lagi')),
+        SnackBar(content: Text('Gagal: $e')),
       );
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -171,9 +252,22 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
     return Scaffold(
       backgroundColor: context.bg,
       appBar: AppBar(
-        title: const Text('Buat Event Anda'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.close_rounded),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'Buat Event',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: context.bg,
+        foregroundColor: context.textPrimary,
+        elevation: 0,
+        scrolledUnderElevation: 0.5,
       ),
       body: Form(
         key: _formKey,
@@ -189,33 +283,55 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                 width: double.infinity,
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
-                  color: AppColors.sand,
+                  color: context.secondaryBg,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: _bannerBytes != null ? AppColors.primary : AppColors.border,
+                    width: _bannerBytes != null ? 2 : 1,
+                  ),
                 ),
                 child: _bannerBytes != null
                     ? Image.memory(_bannerBytes!, fit: BoxFit.cover)
-                    : const Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.08),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
                               Icons.add_photo_alternate_outlined,
-                              size: 32,
-                              color: Colors.white,
+                              size: 24,
+                              color: AppColors.primary,
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Ketuk untuk unggah banner',
-                              style: TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Ketuk untuk unggah banner',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: context.textPrimary,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Format JPG/PNG, maks 2MB',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: context.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
-              'Ketuk gambar di atas untuk memilih banner event',
+              'Ukuran ideal: 1200 x 630 px (rasio ~1.9:1)',
               style: TextStyle(
                 fontSize: 11,
                 color: context.textSecondary,
@@ -248,33 +364,89 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             const SizedBox(height: 16),
 
             _Label('Kategori'),
-            DropdownButtonFormField<String>(
-              value: _category,
-              decoration: _decoration('Pilih kategori'),
-              items: _categories
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                  .toList(),
-              onChanged: (v) => setState(() => _category = v),
+            SizedBox(
+              width: double.infinity,
+              child: DropdownButtonFormField<String>(
+                value: _category,
+                decoration: _decoration('Pilih kategori'),
+                items: _categories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (v) => setState(() => _category = v),
+              ),
             ),
             const SizedBox(height: 16),
 
-            _Label('Tanggal Pelaksanaan'),
+            _Label('Tanggal Mulai'),
             InkWell(
-              onTap: _pickDate,
+              onTap: _pickStartDate,
               borderRadius: BorderRadius.circular(12),
               child: InputDecorator(
-                decoration: _decoration('Pilih tanggal'),
-                child: Text(
-                  _startDate == null
-                      ? 'Belum dipilih'
-                      : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
-                  style: TextStyle(
-                    color: _startDate == null
-                        ? context.textSecondary
-                        : context.textPrimary,
-                  ),
+                decoration: _decoration('Pilih tanggal mulai'),
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_today_rounded, size: 18, color: _startDate == null ? context.textSecondary : AppColors.primary),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _startDate == null
+                            ? 'Belum dipilih'
+                            : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: _startDate == null
+                              ? context.textSecondary
+                              : context.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            ),
+            const SizedBox(height: 16),
+
+            _Label('Tanggal Berakhir'),
+            InkWell(
+              onTap: _pickEndDate,
+              borderRadius: BorderRadius.circular(12),
+              child: InputDecorator(
+                decoration: _decoration('Pilih tanggal berakhir'),
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_today_rounded, size: 18, color: _endDate == null ? context.textSecondary : AppColors.success),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _endDate == null
+                            ? 'Belum dipilih'
+                            : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: _endDate == null
+                              ? context.textSecondary
+                              : context.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            _Label('Maksimal Jumlah Peserta'),
+            TextFormField(
+              controller: _maxParticipantsController,
+              keyboardType: TextInputType.number,
+              decoration: _decoration('Kosongkan jika tidak terbatas'),
+            ),
+            const SizedBox(height: 16),
+
+            _Label('Lokasi'),
+            TextFormField(
+              controller: _locationController,
+              decoration: _decoration('Contoh: Auditorium, Lab Komputer, dll'),
             ),
             const SizedBox(height: 16),
 
@@ -410,12 +582,25 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
   InputDecoration _decoration(String hint) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: TextStyle(color: context.textSecondary, fontSize: 14),
       filled: true,
       fillColor: context.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: AppColors.border, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.border, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.error, width: 1),
       ),
     );
   }

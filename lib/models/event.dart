@@ -7,6 +7,8 @@ class Event {
   final String? category;
   final DateTime startDate;
   final DateTime? endDate;
+  final int? maxParticipants;
+  final String? location;
   final String organizerName;
   final String? contactPerson;
   final String? registrationFormUrl;
@@ -18,6 +20,7 @@ class Event {
   final String? rejectionReason;
   final String? qrSecret;
   final String? proofDocumentUrl;
+  final int participantCount;
 
   Event({
     required this.id,
@@ -28,6 +31,8 @@ class Event {
     this.category,
     required this.startDate,
     this.endDate,
+    this.maxParticipants,
+    this.location,
     required this.organizerName,
     this.contactPerson,
     this.registrationFormUrl,
@@ -39,6 +44,7 @@ class Event {
     this.rejectionReason,
     this.qrSecret,
     this.proofDocumentUrl,
+    this.participantCount = 0,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -51,6 +57,8 @@ class Event {
       category: json['category'],
       startDate: DateTime.parse(json['start_date']),
       endDate: json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
+      maxParticipants: json['max_participants'],
+      location: json['location'],
       organizerName: json['organizer_name'],
       contactPerson: json['contact_person'],
       registrationFormUrl: json['registration_form_url'],
@@ -62,8 +70,10 @@ class Event {
       rejectionReason: json['rejection_reason'],
       qrSecret: json['qr_secret'],
       proofDocumentUrl: json['proof_document_url'],
+      participantCount: json['participant_count'] ?? 0,
     );
   }
+
   Event copyWith({
     String? title,
     String? tagline,
@@ -73,6 +83,10 @@ class Event {
     String? contactPerson,
     String? accessCode,
     String? qrSecret,
+    String? status,
+    int? maxParticipants,
+    String? location,
+    int? participantCount,
   }) {
     return Event(
       id: id,
@@ -83,17 +97,20 @@ class Event {
       category: category,
       startDate: startDate,
       endDate: endDate,
+      maxParticipants: maxParticipants ?? this.maxParticipants,
+      location: location ?? this.location,
       organizerName: organizerName ?? this.organizerName,
       contactPerson: contactPerson ?? this.contactPerson,
       registrationFormUrl: registrationFormUrl,
       accessCode: accessCode ?? this.accessCode,
-      status: status,
+      status: status ?? this.status,
       documentationUrl: documentationUrl,
       certificateUrl: certificateUrl,
       createdBy: createdBy,
       rejectionReason: rejectionReason,
       qrSecret: qrSecret ?? this.qrSecret,
       proofDocumentUrl: proofDocumentUrl,
+      participantCount: participantCount ?? this.participantCount,
     );
   }
 }

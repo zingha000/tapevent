@@ -57,12 +57,6 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  bool get _isFormValid {
-    return _emailController.text.trim().isNotEmpty &&
-        _passwordController.text.isNotEmpty &&
-        _emailController.text.contains('@');
-  }
-
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -160,7 +154,6 @@ class _LoginScreenState extends State<LoginScreen>
                         PrimaryButton(
                           label: 'Masuk',
                           isLoading: _isLoading,
-                          isEnabled: _isFormValid,
                           onPressed: _login,
                         ),
                         const SizedBox(height: 20),

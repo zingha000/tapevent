@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../services/event_service.dart';
+import '../widgets/lottie_loading.dart';
 
 class AdminApprovalHistoryScreen extends StatefulWidget {
   const AdminApprovalHistoryScreen({super.key});
@@ -196,12 +197,21 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: SizedBox(width: 100, height: 100, child: LottieLoading()),
+                  )
                 : _filteredHistory.isEmpty
                     ? Center(
-                        child: Text(
-                          _allHistory.isEmpty ? 'Belum ada event yang diproses' : 'Tidak ada hasil yang cocok',
-                          style: TextStyle(color: context.textSecondary),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.history_rounded, size: 40, color: context.textSecondary),
+                            const SizedBox(height: 10),
+                            Text(
+                              _allHistory.isEmpty ? 'Belum ada event yang diproses' : 'Tidak ada hasil yang cocok',
+                              style: TextStyle(color: context.textSecondary),
+                            ),
+                          ],
                         ),
                       )
                     : ListView.separated(

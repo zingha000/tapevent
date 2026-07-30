@@ -1,12 +1,62 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/event.dart';
 import '../theme/app_colors.dart';
 import '../services/event_service.dart';
 import '../main.dart' show supabase;
 import 'event_manage_screen.dart';
 
-Future<Event?> showAccessCodeDialog(BuildContext context, Event event) {
+Future<Event?> showAccessCodeDialog(BuildContext context, Event event) async {
+  final userId = supabase.auth.currentUser?.id;
+  final isCreator = userId != null && userId == event.createdBy;
+
+  if (isCreator) {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('seen_code_${event.id}') ?? false;
+    if (seen) {
+      return _showEnterCodeDialog(context, event);
+    }
+    final updatedEvent = await _showCreatorFlow(context, event);
+    if (updatedEvent == null) return null;
+    await prefs.setBool('seen_code_${event.id}', true);
+    return _showEnterCodeDialog(context, updatedEvent);
+  }
+  return _showEnterCodeDialog(context, event);
+}
+
+Future<Event?> _showCreatorFlow(BuildContext context, Event event) async {
+  final result = await showGeneralDialog<Event>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Kode Akses',
+    barrierColor: Colors.black.withOpacity(0.3),
+    transitionDuration: const Duration(milliseconds: 250),
+    pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+    transitionBuilder: (context, anim, secondaryAnim, child) {
+      return BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 12 * anim.value,
+          sigmaY: 12 * anim.value,
+        ),
+        child: FadeTransition(
+          opacity: anim,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+              CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+            ),
+            child: _CreatorCodeDialog(event: event),
+          ),
+        ),
+      );
+    },
+  );
+  if (!context.mounted) return null;
+  return result;
+}
+
+Future<Event?> _showEnterCodeDialog(BuildContext context, Event event) {
   return showGeneralDialog<Event>(
     context: context,
     barrierDismissible: true,
@@ -26,7 +76,7 @@ Future<Event?> showAccessCodeDialog(BuildContext context, Event event) {
             scale: Tween<double>(begin: 0.92, end: 1.0).animate(
               CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
             ),
-            child: _AccessCodeDialog(event: event),
+            child: _EnterCodeDialog(event: event),
           ),
         ),
       );
@@ -34,15 +84,218 @@ Future<Event?> showAccessCodeDialog(BuildContext context, Event event) {
   );
 }
 
-class _AccessCodeDialog extends StatefulWidget {
+// ─── Popup 1: Creator melihat / generate kode akses ───
+
+class _CreatorCodeDialog extends StatefulWidget {
   final Event event;
-  const _AccessCodeDialog({required this.event});
+  const _CreatorCodeDialog({required this.event});
 
   @override
-  State<_AccessCodeDialog> createState() => _AccessCodeDialogState();
+  State<_CreatorCodeDialog> createState() => _CreatorCodeDialogState();
 }
 
-class _AccessCodeDialogState extends State<_AccessCodeDialog> {
+class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
+  late String _accessCode;
+  bool _copied = false;
+  bool _regenerating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _accessCode = widget.event.accessCode;
+  }
+
+  Future<void> _regenerate() async {
+    setState(() => _regenerating = true);
+    try {
+      final newCode = await EventService.regenerateAccessCode(widget.event.id);
+      if (!mounted) return;
+      setState(() {
+        _accessCode = newCode;
+        _copied = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal generate kode baru')),
+      );
+    } finally {
+      if (mounted) setState(() => _regenerating = false);
+    }
+  }
+
+  void _copyCode() {
+    Clipboard.setData(ClipboardData(text: _accessCode));
+    setState(() => _copied = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          decoration: BoxDecoration(
+            color: context.surface,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(Icons.vpn_key_rounded, color: AppColors.primary, size: 28),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Kode Akses Event',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Bagikan kode ini ke panitia lain agar mereka bisa mengakses event',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.4),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline_rounded, size: 16, color: AppColors.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Kode akses ini hanya ditampilkan sekali. Salin dan simpan dengan baik.',
+                        style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.3),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: context.bg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                ),
+                child: Text(
+                  _accessCode.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    letterSpacing: 4,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton.icon(
+                  onPressed: _copied ? null : _copyCode,
+                  icon: Icon(
+                    _copied ? Icons.check_rounded : Icons.copy_rounded,
+                    size: 18,
+                    color: _copied ? AppColors.success : AppColors.primary,
+                  ),
+                  label: Text(
+                    _copied ? 'Tersalin' : 'Salin Kode',
+                    style: TextStyle(
+                      color: _copied ? AppColors.success : AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: _copied ? AppColors.success : AppColors.primary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton.icon(
+                  onPressed: _regenerating ? null : _regenerate,
+                  icon: _regenerating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                        )
+                      : const Icon(Icons.refresh_rounded, size: 18, color: AppColors.primary),
+                  label: const Text(
+                    'Buat Kode Baru',
+                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.primary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final updated = widget.event.copyWith(accessCode: _accessCode);
+                    Navigator.of(context).pop(updated);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: const Text('OK, Masuk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Popup 2: Masukkan kode akses ───
+
+class _EnterCodeDialog extends StatefulWidget {
+  final Event event;
+  const _EnterCodeDialog({required this.event});
+
+  @override
+  State<_EnterCodeDialog> createState() => _EnterCodeDialogState();
+}
+
+class _EnterCodeDialogState extends State<_EnterCodeDialog> {
   final _codeController = TextEditingController();
   String? _errorText;
 
@@ -116,7 +369,7 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Kode ini didapat dari pembuat event\n"${widget.event.title}"',
+                'Masukkan kode akses untuk mengelola event',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.4),
               ),
@@ -126,6 +379,7 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
                 autofocus: true,
                 textAlign: TextAlign.center,
                 textCapitalization: TextCapitalization.characters,
+                inputFormatters: [_UpperCaseTextFormatter()],
                 style: const TextStyle(fontSize: 18, letterSpacing: 3, fontWeight: FontWeight.w700),
                 decoration: InputDecoration(
                   hintText: 'Kode',
@@ -135,7 +389,19 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: AppColors.error),
                   ),
                 ),
                 onSubmitted: (_) => _submit(),
@@ -178,5 +444,12 @@ class _AccessCodeDialogState extends State<_AccessCodeDialog> {
         ),
       ),
     );
+  }
+}
+
+class _UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }

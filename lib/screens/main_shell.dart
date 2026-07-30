@@ -40,33 +40,81 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _index, children: _pages),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: _onTabChanged,
-        backgroundColor: context.surface,
-        indicatorColor: AppColors.primary.withOpacity(0.12),
-        destinations: [
-          NavigationDestination(
-            icon: Icon(AppIcons.home, color: context.textSecondary),
-            selectedIcon: Icon(AppIcons.home, color: AppColors.primary),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: context.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 16,
+              offset: const Offset(0, -3),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, -1),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+            child: Row(
+              children: [
+                _buildNavItem(0, AppIcons.home, 'Home'),
+                _buildNavItem(1, AppIcons.dashboard, 'Dashboard'),
+                _buildNavItem(2, AppIcons.history, 'Riwayat'),
+                _buildNavItem(3, AppIcons.profile, 'Saya'),
+              ],
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(AppIcons.dashboard, color: context.textSecondary),
-            selectedIcon: Icon(AppIcons.dashboard, color: AppColors.primary),
-            label: 'Dashboard',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    final isActive = _index == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _onTabChanged(index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.primary.withOpacity(0.08) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
           ),
-          NavigationDestination(
-            icon: Icon(AppIcons.history, color: context.textSecondary),
-            selectedIcon: Icon(AppIcons.history, color: AppColors.primary),
-            label: 'Riwayat',
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedScale(
+                scale: isActive ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: isActive ? AppColors.primary : context.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 3),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+                  color: isActive ? AppColors.primary : context.textSecondary,
+                ),
+                child: Text(label),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(AppIcons.profile, color: context.textSecondary),
-            selectedIcon: Icon(AppIcons.profile, color: AppColors.primary),
-            label: 'Saya',
-          ),
-        ],
+        ),
       ),
     );
   }

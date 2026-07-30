@@ -134,18 +134,23 @@ class _SayaScreenState extends State<SayaScreen> {
                                     child: CircleAvatar(
                                       radius: 42,
                                       backgroundColor: Colors.white,
-                                      child: CircleAvatar(
-                                        radius: 38,
-                                        backgroundColor: AppColors.primary.withOpacity(0.15),
-                                        child: Text(
-                                          fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
-                                          style: const TextStyle(
-                                            fontSize: 32,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.primary,
-                                          ),
-                                        ),
-                                      ),
+                                      backgroundImage: profile?['avatar_url'] != null
+                                          ? NetworkImage(profile!['avatar_url'] as String) as ImageProvider
+                                          : null,
+                                      child: profile?['avatar_url'] == null
+                                          ? CircleAvatar(
+                                              radius: 38,
+                                              backgroundColor: AppColors.primary.withOpacity(0.15),
+                                              child: Text(
+                                                fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
+                                                style: const TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.primary,
+                                                ),
+                                              ),
+                                            )
+                                          : null,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -271,9 +276,19 @@ class _SayaScreenState extends State<SayaScreen> {
             ),
 
             const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(height: 1, color: AppColors.border),
+            ),
+            const SizedBox(height: 8),
             _SectionLabel('Preferensi'),
             _DarkModeTile(isDark: isDark),
 
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(height: 1, color: AppColors.border),
+            ),
             const SizedBox(height: 8),
             _SectionLabel('Lainnya'),
             _MenuTile(
@@ -284,6 +299,7 @@ class _SayaScreenState extends State<SayaScreen> {
                 MaterialPageRoute(
                   builder: (_) => const StaticInfoScreen(
                     title: 'Kebijakan & Privasi',
+                    description: 'Informasi mengenai privasi dan data pengguna',
                     content: 'Konten kebijakan privasi TapEvent akan ditambahkan di sini.',
                   ),
                 ),
@@ -297,6 +313,7 @@ class _SayaScreenState extends State<SayaScreen> {
                 MaterialPageRoute(
                   builder: (_) => const StaticInfoScreen(
                     title: 'Bantuan',
+                    description: 'Pusat bantuan dan pertanyaan umum',
                     content: 'Halaman bantuan/FAQ TapEvent akan ditambahkan di sini.',
                   ),
                 ),
@@ -310,6 +327,7 @@ class _SayaScreenState extends State<SayaScreen> {
                 MaterialPageRoute(
                   builder: (_) => const StaticInfoScreen(
                     title: 'Tentang Aplikasi',
+                    description: 'Informasi mengenai aplikasi TapEvent',
                     content: 'TapEvent — Digital Campus Event Management Platform.',
                   ),
                 ),
