@@ -22,7 +22,7 @@ class ProfileService {
   }
 
   static String _generateRandomCode() {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = DateTime.now().microsecondsSinceEpoch;
     return List.generate(6, (i) => chars[(random ~/ (i + 3)) % chars.length]).join();
   }

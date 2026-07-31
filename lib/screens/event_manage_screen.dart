@@ -1,10 +1,18 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:js_interop';
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
+import 'package:web/web.dart' as web;
 import '../models/event.dart';
 import '../theme/app_colors.dart';
 import '../main.dart' show supabase;
@@ -28,6 +36,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
   bool _savingDoc = false;
   bool _savingCert = false;
   bool _uploadingCsv = false;
+  bool _downloadingPdf = false;
   late Future<List<Map<String, dynamic>>> _participantsFuture;
 
   @override
@@ -859,6 +868,158 @@ class _EventManageScreenState extends State<EventManageScreen> {
     }
   }
 
+  Future<void> _downloadPdf() async {
+    if (_downloadingPdf) return;
+    setState(() => _downloadingPdf = true);
+    try {
+      final participants = await _participantsFuture;
+      if (!mounted) return;
+      if (participants.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Belum ada peserta untuk diunduh')),
+        );
+        return;
+      }
+
+      String formatDate(DateTime? d) =>
+          d == null ? '-' : '${d.day}/${d.month}/${d.year}';
+      final rows = participants.map((p) {
+        final profile = p['profiles'] as Map<String, dynamic>?;
+        final attendanceList = p['attendances'] as List?;
+        final hasAttended = attendanceList != null && attendanceList.isNotEmpty;
+        final cancellationRequested = p['cancellation_requested'] == true;
+        return [
+          profile?['identity_number']?.toString() ?? '-',
+          profile?['full_name']?.toString() ?? '-',
+          hasAttended ? 'Hadir' : 'Belum hadir',
+          cancellationRequested ? 'Diajukan' : '-',
+        ];
+      }).toList();
+
+      final doc = pw.Document();
+      doc.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(28),
+          footer: (context) => pw.Align(
+            alignment: pw.Alignment.centerRight,
+            child: pw.Text(
+              'Halaman ${context.pageNumber} dari ${context.pagesCount}',
+              style: pw.TextStyle(
+                fontSize: 9,
+                color: PdfColors.grey500,
+              ),
+            ),
+          ),
+          build: (context) => [
+            pw.Text(
+              _event.title,
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.SizedBox(height: 4),
+            pw.Text(
+              'Penyelenggara: ${_event.organizerName}',
+              style: pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+            ),
+            pw.Text(
+              'Tanggal: ${formatDate(_event.startDate)}'
+              '${_event.endDate != null ? ' - ${formatDate(_event.endDate)}' : ''}',
+              style: pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+            ),
+            pw.SizedBox(height: 6),
+            pw.Divider(color: PdfColors.grey300),
+            pw.SizedBox(height: 6),
+            pw.Text(
+              'Daftar Peserta (${participants.length} orang)',
+              style: pw.TextStyle(
+                fontSize: 13,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.SizedBox(height: 10),
+            pw.TableHelper.fromTextArray(
+              headers: ['No', 'NIM/NIP', 'Nama', 'Status Hadir', 'Pembatalan'],
+              data: [
+                for (var i = 0; i < participants.length; i++)
+                  ['${i + 1}', ...rows[i]],
+              ],
+              headerDecoration: const pw.BoxDecoration(
+                color: PdfColors.grey100,
+              ),
+              headerStyle: pw.TextStyle(
+                fontSize: 10,
+                fontWeight: pw.FontWeight.bold,
+              ),
+              cellStyle: const pw.TextStyle(fontSize: 10),
+              headerAlignment: pw.Alignment.centerLeft,
+              cellAlignment: pw.Alignment.centerLeft,
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 6,
+                vertical: 6,
+              ),
+              columnWidths: const {
+                0: pw.FixedColumnWidth(36),
+                1: pw.FixedColumnWidth(88),
+                2: pw.FlexColumnWidth(),
+                3: pw.FixedColumnWidth(88),
+                4: pw.FixedColumnWidth(72),
+              },
+              border: pw.TableBorder.all(
+                color: PdfColors.grey300,
+                width: 0.6,
+              ),
+            ),
+          ],
+        ),
+      );
+
+      final bytes = await doc.save();
+      final safeTitle = _event.title
+          .replaceAll(RegExp(r'[^\w\s-]'), '')
+          .replaceAll(RegExp(r'\s+'), '_');
+      final filename = 'daftar_peserta_$safeTitle.pdf';
+      if (kIsWeb) {
+        _downloadPdfOnWeb(bytes, filename);
+      } else {
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/$filename');
+        await file.writeAsBytes(bytes);
+        if (!mounted) return;
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(file.path)],
+            text: 'Daftar Peserta - ${_event.title}',
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('PDF download failed: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal membuat PDF: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _downloadingPdf = false);
+    }
+  }
+
+  void _downloadPdfOnWeb(Uint8List bytes, String filename) {
+    final blob = web.Blob(
+      [bytes.toJS].toJS,
+      web.BlobPropertyBag(type: 'application/pdf'),
+    );
+    final url = web.URL.createObjectURL(blob);
+    final anchor = web.HTMLAnchorElement()
+      ..href = url
+      ..download = filename;
+    web.window.document.body?.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
   Future<void> _dropParticipant(Map<String, dynamic> participant) async {
     final reasonController = TextEditingController();
     final profile = participant['profiles'] as Map<String, dynamic>?;
@@ -1231,36 +1392,88 @@ class _EventManageScreenState extends State<EventManageScreen> {
                   ),
 
                   const SizedBox(height: 24),
+                  Text(
+                    'Daftar Peserta',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          'Daftar Peserta',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: context.textPrimary,
+                        child: SizedBox(
+                          height: 42,
+                          child: OutlinedButton.icon(
+                            onPressed: _downloadingPdf ? null : _downloadPdf,
+                            icon: _downloadingPdf
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.picture_as_pdf_rounded,
+                                    size: 16,
+                                    color: AppColors.primary,
+                                  ),
+                            label: Text(
+                              _downloadingPdf
+                                  ? 'Menyiapkan...'
+                                  : 'Download PDF',
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.primary),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: _uploadingCsv ? null : _uploadCsv,
-                        icon: _uploadingCsv
-                            ? const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.upload_file_rounded,
-                                size: 16,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: SizedBox(
+                          height: 42,
+                          child: OutlinedButton.icon(
+                            onPressed: _uploadingCsv ? null : _uploadCsv,
+                            icon: _uploadingCsv
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.upload_file_rounded,
+                                    size: 16,
+                                    color: AppColors.primary,
+                                  ),
+                            label: Text(
+                              _uploadingCsv ? 'Memproses...' : 'Upload CSV',
+                              style: const TextStyle(
                                 color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
                               ),
-                        label: Text(
-                          _uploadingCsv ? 'Memproses...' : 'Upload CSV',
-                          style: const TextStyle(color: AppColors.primary),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.primary),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -1268,7 +1481,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
 
                   const SizedBox(height: 4),
                   Text(
-                    'Format: baris pertama header, kolom pertama = NIM/NIP',
+                    'Format CSV: baris pertama header, kolom pertama = NIM/NIP',
                     style: TextStyle(
                       fontSize: 11,
                       color: context.textSecondary,

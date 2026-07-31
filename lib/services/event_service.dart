@@ -184,7 +184,12 @@ class EventService {
 
     if (matchedList.isNotEmpty) {
       final rows = matchedList
-          .map((p) => {'event_id': eventId, 'user_id': p['id']})
+          .map((p) => {
+                'event_id': eventId,
+                'user_id': p['id'],
+                'is_dropped': false,
+                'dropped_reason': null,
+              })
           .toList();
       await supabase.from('registrations').upsert(rows, onConflict: 'event_id,user_id');
     }
@@ -256,7 +261,7 @@ class EventService {
   }
 
   static String _generateRandomCode() {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = DateTime.now().microsecondsSinceEpoch;
     return List.generate(6, (i) => chars[(random ~/ (i + 3)) % chars.length]).join();
   }

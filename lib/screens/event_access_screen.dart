@@ -311,7 +311,20 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
       setState(() => _errorText = 'Kode akses wajib diisi');
       return;
     }
-    if (input != widget.event.accessCode) {
+
+    String storedCode = widget.event.accessCode;
+    try {
+      final current = await supabase
+          .from('events')
+          .select('access_code')
+          .eq('id', widget.event.id)
+          .maybeSingle();
+      storedCode = current?['access_code']?.toString() ?? storedCode;
+    } catch (_) {
+      // Jika gagal ambil data terbaru, fallback ke kode dari objek event.
+    }
+
+    if (input.toUpperCase() != storedCode.trim().toUpperCase()) {
       setState(() => _errorText = 'Kode akses salah');
       return;
     }
