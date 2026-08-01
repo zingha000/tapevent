@@ -104,6 +104,34 @@ class _EventManageScreenState extends State<EventManageScreen> {
     }
   }
 
+  Future<void> _openEditScreen() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EventEditScreen(event: _event)),
+    );
+    if (result != null && result is Event) {
+      setState(() => _event = result);
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
   Future<void> _confirmComplete() async {
     final confirmed = await showGeneralDialog<bool>(
       context: context,
@@ -133,13 +161,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.shadowColor(0.15),
-                          blurRadius: 30,
-                          offset: const Offset(0, 12),
-                        ),
-                      ],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -275,13 +297,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.shadowColor(0.15),
-                          blurRadius: 30,
-                          offset: const Offset(0, 12),
-                        ),
-                      ],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -432,7 +448,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -442,10 +458,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.accentBlue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
-                          child: const Icon(Icons.vpn_key_rounded, color: AppColors.primary, size: 28),
+                          child: const Icon(Icons.vpn_key_rounded, color: AppColors.accentBlue, size: 28),
                         ),
                         const SizedBox(height: 16),
                         const Text('Ganti Kode Akses',
@@ -454,18 +470,18 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.08),
+                            color: AppColors.accentBlue.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.info_outline_rounded, size: 16, color: AppColors.primary),
+                              Icon(Icons.info_outline_rounded, size: 16, color: AppColors.accentBlue),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Kode akses hanya perlu diketahui oleh penyelenggara. Jika ada orang luar yang mengetahuinya, segera buat kode baru.',
-                                  style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.4),
+                                  style: TextStyle(fontSize: 12, color: AppColors.accentBlue, height: 1.4),
                                 ),
                               ),
                             ],
@@ -483,7 +499,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                             icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
                             label: const Text('Buat Kode Baru', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
+                              backgroundColor: AppColors.accentBlue,
                               elevation: 0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
@@ -525,7 +541,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Batal')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Buat Baru', style: TextStyle(color: AppColors.primary)),
+            child: const Text('Buat Baru', style: TextStyle(color: AppColors.accentBlue)),
           ),
         ],
       ),
@@ -565,7 +581,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -587,18 +603,18 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.08),
+                            color: Colors.orange.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.warning_amber_rounded, size: 16, color: AppColors.primary),
+                              Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Kode ini hanya ditampilkan sekali. Salin sekarang, setelah ini tidak bisa dilihat lagi.',
-                                  style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.4),
+                                  style: TextStyle(fontSize: 12, color: Colors.orange, height: 1.4),
                                 ),
                               ),
                             ],
@@ -611,12 +627,12 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           decoration: BoxDecoration(
                             color: context.bg,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.success.withOpacity(0.3)),
+                            border: Border.all(color: AppColors.accentBlue.withOpacity(0.3)),
                           ),
                           child: Text(
                             newCode.toUpperCase(),
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 24, letterSpacing: 4, fontWeight: FontWeight.w800, color: AppColors.primary),
+                            style: const TextStyle(fontSize: 24, letterSpacing: 4, fontWeight: FontWeight.w800, color: AppColors.accentBlue),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -630,10 +646,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 const SnackBar(content: Text('Kode akses disalin')),
                               );
                             },
-                            icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
-                            label: const Text('Salin Kode', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                            icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.accentBlue),
+                            label: const Text('Salin Kode', style: TextStyle(color: AppColors.accentBlue, fontWeight: FontWeight.w600)),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.primary),
+                              side: const BorderSide(color: AppColors.accentBlue),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           ),
@@ -642,14 +658,13 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: 46,
-                          child: ElevatedButton(
+                          child: OutlinedButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              elevation: 0,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.border),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
-                            child: const Text('Tutup', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            child: Text('Tutup', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -690,7 +705,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -699,10 +714,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.accentBlue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
-                          child: const Icon(Icons.more_horiz_rounded, color: AppColors.primary, size: 28),
+                          child: const Icon(Icons.more_horiz_rounded, color: AppColors.accentBlue, size: 28),
                         ),
                         const SizedBox(height: 16),
                         const Text('Aksi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
@@ -732,15 +747,16 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: 48,
-                          child: OutlinedButton.icon(
+                          child: ElevatedButton.icon(
                             onPressed: () {
                               Navigator.of(context).pop();
                               _confirmDelete();
                             },
-                            icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 20),
-                            label: const Text('Hapus Event', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.red),
+                            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
+                            label: const Text('Hapus Event', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              elevation: 0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                           ),
@@ -749,14 +765,13 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: 46,
-                          child: ElevatedButton(
+                          child: OutlinedButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              elevation: 0,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.border),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
-                            child: const Text('Tutup', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            child: Text('Tutup', style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -1052,13 +1067,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.shadowColor(0.15),
-                          blurRadius: 30,
-                          offset: const Offset(0, 12),
-                        ),
-                      ],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -1251,115 +1260,285 @@ class _EventManageScreenState extends State<EventManageScreen> {
         Navigator.of(context).pop(_event);
       },
       child: Scaffold(
-        backgroundColor: context.bg,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text('Kelola Event', overflow: TextOverflow.ellipsis),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-        ),
+        backgroundColor:
+            context.isDark ? context.bg : AppColors.pageBackground,
         body: ListView(
-          padding: EdgeInsets.zero,
+          padding: const EdgeInsets.only(bottom: 32),
           children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
-                width: double.infinity,
-                color: AppColors.sand,
-                child: _event.bannerUrl != null
-                    ? Image.network(_event.bannerUrl!, fit: BoxFit.cover)
-                    : const Center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: 36,
-                          color: Colors.white70,
+            Stack(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFFE94057), Color(0xFF2848D6)],
+                        ),
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(28),
                         ),
                       ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.fromLTRB(
+                        20,
+                        MediaQuery.paddingOf(context).top + 18,
+                        20,
+                        36,
+                      ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _event.title,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: context.textPrimary,
-                          ),
-                        ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.22),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Event Management',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                       ),
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EventEditScreen(event: _event),
-                            ),
-                          );
-                          if (result != null && result is Event) {
-                            setState(() => _event = result);
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.edit_outlined,
-                          size: 16,
-                          color: AppColors.primary,
-                        ),
-                        label: const Text(
-                          'Edit',
-                          style: TextStyle(color: AppColors.primary),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _event.description ?? 'Belum ada deskripsi.',
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Kelola Event',
                     style: TextStyle(
-                      fontSize: 13,
-                      height: 1.5,
-                      color: context.textSecondary,
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+                    ),
+                    ),
+                    const SizedBox(height: 154),
+                  ],
+                ),
+                Positioned(
+              left: 16,
+              right: 16,
+              bottom: 0,
+              child: Container(
+                height: 190,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: context.border, width: 1),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (_event.bannerUrl != null)
+                      Image.network(_event.bannerUrl!, fit: BoxFit.cover)
+                    else
+                      Container(
+                        color: AppColors.sand,
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 36,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.6),
+                          ],
+                          stops: [0.55, 1.0],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_event.status == 'active')
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.accentPink,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.circle,
+                                    color: Colors.white,
+                                    size: 8,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'Live Now',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          const Spacer(),
+                          Text(
+                            _event.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_today_rounded,
+                                size: 12,
+                                color: Colors.white70,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  _formatDate(_event.startDate),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.description_outlined,
+                              size: 18,
+                              color: AppColors.accentBlue,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Description',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: context.textPrimary,
+                                ),
+                              ),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: _openEditScreen,
+                              icon: const Icon(
+                                Icons.edit_outlined,
+                                size: 14,
+                                color: AppColors.accentBlue,
+                              ),
+                              label: const Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: AppColors.accentBlue,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: AppColors.accentBlue,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _event.description ?? 'Belum ada deskripsi.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            height: 1.5,
+                            color: context.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: 54,
                     child: ElevatedButton.icon(
                       onPressed: _showQrDialog,
                       icon: const Icon(
                         Icons.qr_code_rounded,
-                        size: 20,
+                        size: 22,
                         color: Colors.white,
                       ),
                       label: const Text(
                         'Tampilkan QR Absensi',
                         style: TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           fontSize: 15,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.accentBlue,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
@@ -1367,9 +1546,24 @@ class _EventManageScreenState extends State<EventManageScreen> {
 
                   const SizedBox(height: 24),
 
-                  _LinkSection(
-                    label: 'Link Dokumentasi (Drive)',
+                  Text(
+                    'Event Assets',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _AssetCard(
+                    icon: Icons.folder_shared_rounded,
+                    iconBg: const Color(0xFFEDE7FF),
+                    iconColor: const Color(0xFF7B5CFF),
+                    title: 'Link Dokumentasi',
+                    subtitle: 'Share photos and video links',
                     controller: _docController,
+                    placeholder: 'https://drive.google.com/...',
+                    buttonLabel: 'Update Documentation',
                     isLoading: _savingDoc,
                     onSubmit: () => _saveField(
                       'documentation_url',
@@ -1378,11 +1572,17 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
 
-                  _LinkSection(
-                    label: 'Link Sertifikat (Drive)',
+                  _AssetCard(
+                    icon: Icons.workspace_premium_rounded,
+                    iconBg: const Color(0xFFFFEEDB),
+                    iconColor: const Color(0xFFFF8A3D),
+                    title: 'Link Sertifikat',
+                    subtitle: 'Provide certificate distribution link',
                     controller: _certController,
+                    placeholder: 'https://drive.google.com/...',
+                    buttonLabel: 'Update Certificate Link',
                     isLoading: _savingCert,
                     onSubmit: () => _saveField(
                       'certificate_url',
@@ -1392,14 +1592,24 @@ class _EventManageScreenState extends State<EventManageScreen> {
                   ),
 
                   const SizedBox(height: 24),
-                  Text(
-                    'Daftar Peserta',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: context.textPrimary,
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
                     ),
-                  ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Daftar Peserta',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: context.textPrimary,
+                          ),
+                        ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -1419,20 +1629,20 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 : const Icon(
                                     Icons.picture_as_pdf_rounded,
                                     size: 16,
-                                    color: AppColors.primary,
+                                    color: AppColors.softBlue,
                                   ),
                             label: Text(
                               _downloadingPdf
                                   ? 'Menyiapkan...'
                                   : 'Download PDF',
                               style: const TextStyle(
-                                color: AppColors.primary,
+                                color: AppColors.softBlue,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.primary),
+                              side: const BorderSide(color: AppColors.softBlue),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -1457,18 +1667,18 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 : const Icon(
                                     Icons.upload_file_rounded,
                                     size: 16,
-                                    color: AppColors.primary,
+                                    color: AppColors.softBlue,
                                   ),
                             label: Text(
                               _uploadingCsv ? 'Memproses...' : 'Upload CSV',
                               style: const TextStyle(
-                                color: AppColors.primary,
+                                color: AppColors.softBlue,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.primary),
+                              side: const BorderSide(color: AppColors.softBlue),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -1692,11 +1902,21 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 28),
-                  const Divider(),
-                  const SizedBox(height: 12),
-
-                  Text('Daftar Akses Kelola Event',
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Daftar Akses Kelola Event',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.textPrimary)),
                   const SizedBox(height: 4),
                   Text('Semua orang yang pernah masuk lewat kode akses',
@@ -1805,9 +2025,20 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 8),
-                  ListTile(
-                    onTap: () => _showAccessCodePopup(),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          onTap: () => _showAccessCodePopup(),
                     leading: Icon(Icons.vpn_key_outlined, color: context.textPrimary, size: 22),
                     title: const Text('Ganti Kode Akses', style: TextStyle(fontSize: 14)),
                     trailing: Icon(Icons.chevron_right_rounded, color: context.textSecondary),
@@ -1819,7 +2050,10 @@ class _EventManageScreenState extends State<EventManageScreen> {
                     title: const Text('Aksi', style: TextStyle(fontSize: 14)),
                     trailing: Icon(Icons.chevron_right_rounded, color: context.textSecondary),
                   ),
-                  const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -1827,18 +2061,18 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       onPressed: () => Navigator.of(context).pop(_event),
                       icon: const Icon(
                         Icons.logout_rounded,
-                        color: AppColors.primary,
+                        color: AppColors.softBlue,
                         size: 20,
                       ),
                       label: const Text(
                         'Keluar dari Kelola Event',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.softBlue,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primary),
+                        side: const BorderSide(color: AppColors.softBlue),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -1855,89 +2089,141 @@ class _EventManageScreenState extends State<EventManageScreen> {
   }
 }
 
-class _LinkSection extends StatelessWidget {
-  final String label;
+class _AssetCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
   final TextEditingController controller;
+  final String placeholder;
+  final String buttonLabel;
   final bool isLoading;
   final VoidCallback onSubmit;
 
-  const _LinkSection({
-    required this.label,
+  const _AssetCard({
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
     required this.controller,
+    required this.placeholder,
+    required this.buttonLabel,
     this.isLoading = false,
     required this.onSubmit,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: context.textPrimary,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.border, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: iconColor, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: context.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: context.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: 'https://drive.google.com/...',
-            filled: true,
-            fillColor: context.surface,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 12,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          height: 44,
-          child: ElevatedButton(
-            onPressed: isLoading ? null : onSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
+          const SizedBox(height: 12),
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: placeholder,
+              filled: true,
+              fillColor: context.bg,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: AppColors.accentBlue,
+                  width: 1.5,
+                ),
               ),
             ),
-            child: isLoading
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text(
-                    'Submit',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
           ),
-        ),
-      ],
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : onSubmit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accentBlue,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      buttonLabel,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -2004,13 +2290,7 @@ class _QrDialogWidgetState extends State<_QrDialogWidget> {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 30,
-                offset: const Offset(0, 12),
-              ),
-            ],
+            border: Border.all(color: context.border, width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2040,8 +2320,8 @@ class _QrDialogWidgetState extends State<_QrDialogWidget> {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         value: _secondsLeft / 5,
-                        color: AppColors.primary,
-                        backgroundColor: AppColors.primary.withOpacity(0.15),
+                        color: AppColors.accentBlue,
+                        backgroundColor: AppColors.accentBlue.withOpacity(0.15),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -2050,15 +2330,7 @@ class _QrDialogWidgetState extends State<_QrDialogWidget> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  Text(
-                    'Refresh dalam $_secondsLeft detik',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                      color: AppColors.accentBlue,
                     ),
                   ),
                 ],

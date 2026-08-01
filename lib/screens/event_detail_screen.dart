@@ -69,7 +69,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -99,7 +99,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                              borderSide: const BorderSide(color: AppColors.accentBlue, width: 1.5),
                             ),
                           ),
                         ),
@@ -221,7 +221,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -255,7 +255,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           child: ElevatedButton(
                             onPressed: () => Navigator.of(context).pop(),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
+                              backgroundColor: AppColors.accentBlue,
                               elevation: 0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
@@ -285,13 +285,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.bg,
+      backgroundColor: context.pageScaffoldColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 220,
             pinned: true,
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.accentBlue,
             leading: Padding(
               padding: const EdgeInsets.only(left: 8, top: 4),
               child: Container(
@@ -327,28 +327,44 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: widget.event.bannerUrl != null
-                  ? Image.network(widget.event.bannerUrl!, fit: BoxFit.cover)
-                  : Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFFF62440), Color(0xFFB80E2C)],
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  widget.event.bannerUrl != null
+                      ? Image.network(widget.event.bannerUrl!, fit: BoxFit.cover)
+                      : Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [AppColors.accentPink, AppColors.accentBlue],
+                            ),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.image_outlined, size: 48, color: Colors.white70),
+                          ),
                         ),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.image_outlined, size: 48, color: Colors.white70),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black38],
+                        stops: [0.6, 1.0],
                       ),
                     ),
+                  ),
+                ],
+              ),
             ),
           ),
           SliverToBoxAdapter(
             child: Container(
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: context.bg,
+                color: context.surface,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border(top: BorderSide(color: context.border, width: 1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,7 +396,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.accentBlue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -388,7 +404,50 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primary,
+                              color: AppColors.accentBlue,
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (!_loadingRegistration &&
+                          _myRegistration != null &&
+                          _myRegistration!['cancellation_requested'] != true) ...[
+                        const SizedBox(height: 14),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const QrScanScreen(),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            decoration: BoxDecoration(
+                              color: AppColors.accentBlue.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.qr_code_scanner_rounded,
+                                  color: AppColors.accentBlue,
+                                  size: 22,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Scan Absen',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.accentBlue,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -397,17 +456,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ),
                 ),
 
-                // ─── Divider 1 ───
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  child: Container(height: 1, color: AppColors.border),
-                ),
+                const SizedBox(height: 20),
 
                 // ─── Info Section: Jadwal → Lokasi → Penyelenggara → Contact → Kuota ───
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: Column(
+                      children: [
                       _InfoRow(
                         icon: AppIcons.calendar,
                         label: 'Jadwal',
@@ -448,12 +510,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ],
                   ),
                 ),
-
-                // ─── Divider 2 ───
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  child: Container(height: 1, color: AppColors.border),
                 ),
+                const SizedBox(height: 20),
 
                 // ─── Dokumentasi & Sertifikat (hanya untuk completed) ───
                 if (widget.event.status == 'completed') ...[
@@ -485,33 +543,61 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                 ],
 
                 // ─── Description ───
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Deskripsi',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.textPrimary),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        widget.event.description ?? 'Belum ada deskripsi.',
-                        style: TextStyle(fontSize: 14, height: 1.6, color: context.textSecondary),
-                      ),
-                    ],
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.description_outlined,
+                              size: 18,
+                              color: AppColors.accentBlue,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Deskripsi',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: context.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          height: 150,
+                          width: double.infinity,
+                          alignment: Alignment.topLeft,
+                          child: SingleChildScrollView(
+                            child: Text(
+                              widget.event.description ?? 'Belum ada deskripsi.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.6,
+                                color: context.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-
-                // ─── Divider 3 ───
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  child: Container(height: 1, color: AppColors.border),
-                ),
+                const SizedBox(height: 24),
 
                 // ─── Action Buttons ───
                 if (widget.event.status != 'completed')
@@ -519,47 +605,29 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton.icon(
-                            onPressed: () => _openRegistrationForm(context),
-                            icon: const Icon(Icons.edit_document, color: Colors.white, size: 20),
-                            label: const Text(
-                              'Formulir Pendaftaran',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Center(
-                          child: Text(
-                            'Akan membuka Google Form di luar aplikasi',
-                            style: TextStyle(fontSize: 12, color: context.textSecondary),
-                          ),
-                        ),
-
-                        if (!_loadingRegistration && _myRegistration != null && _myRegistration!['cancellation_requested'] != true) ...[
-                          const SizedBox(height: 12),
+                        if (!_loadingRegistration && _myRegistration == null) ...[
                           SizedBox(
                             width: double.infinity,
                             height: 52,
                             child: ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => const QrScanScreen()));
-                              },
-                              icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 20),
-                              label: const Text('Scan Absen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                              onPressed: () => _openRegistrationForm(context),
+                              icon: const Icon(Icons.edit_document, color: Colors.white, size: 20),
+                              label: const Text(
+                                'Formulir Pendaftaran',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                              ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
+                                backgroundColor: AppColors.accentBlue,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              'Akan membuka Google Form di luar aplikasi',
+                              style: TextStyle(fontSize: 12, color: context.textSecondary),
                             ),
                           ),
                         ],
@@ -595,10 +663,24 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               ),
                             ),
                         ],
+
+                        if (_loadingRegistration) ...[
+                          const SizedBox(height: 8),
+                          const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: AppColors.accentBlue,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -624,10 +706,10 @@ class _InfoRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: context.bg,
+            color: AppColors.accentBlue.withOpacity(0.08),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 18, color: AppColors.primary),
+          child: Icon(icon, size: 18, color: AppColors.accentBlue),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -661,7 +743,7 @@ class _DocCertButton extends StatelessWidget {
         icon: Icon(icon, size: 20),
         label: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2563EB),
+          backgroundColor: AppColors.accentBlue,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

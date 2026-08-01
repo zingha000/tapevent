@@ -73,7 +73,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -195,7 +195,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(28),
-                      boxShadow: [BoxShadow(color: context.shadowColor(0.15), blurRadius: 30, offset: const Offset(0, 12))],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -437,7 +437,6 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                         color: context.surface,
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(color: AppColors.border),
-                        boxShadow: [BoxShadow(color: context.shadowColor(0.1), blurRadius: 16, offset: const Offset(0, 4))],
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: Column(
@@ -484,7 +483,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                             child: ElevatedButton(
                               onPressed: () => _showDetailDialog(event),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
+                                backgroundColor: AppColors.accentBlue,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),

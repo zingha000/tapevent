@@ -24,7 +24,7 @@ class ScreenHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF62440), Color(0xFFD81336), Color(0xFFB80E2C)],
+          colors: [AppColors.accentPink, AppColors.accentBlue],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28),

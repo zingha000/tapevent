@@ -101,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       backgroundColor: context.bg,
       appBar: AppBar(
         title: const Text('Data Pribadi'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.accentBlue,
         foregroundColor: Colors.white,
       ),
       body: ListView(
@@ -173,7 +173,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: ElevatedButton(
               onPressed: _isSaving ? null : _save,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.accentBlue,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
@@ -202,7 +202,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.accentBlue, width: 1.5),
       ),
     );
   }

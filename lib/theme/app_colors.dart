@@ -17,12 +17,12 @@ class AppColors {
   static const Color lightTextSecondary = Color(0xFF6B6B6B);
 
   // ===== Dark Mode =====
-  static const Color darkBackground = Color(0xFF1A1512);
-  static const Color darkSurface = Color(0xFF2B2420);
-  static const Color darkSecondaryBackground = Color(0xFF352E28);
-  static const Color darkBorder = Color(0xFF3D3530);
-  static const Color darkPlaceholder = Color(0xFF8A7E76);
-  static const Color darkTextPrimary = Color(0xFFFFFAF3);
+  static const Color darkBackground = Color(0xFF111111);
+  static const Color darkSurface = Color(0xFF1E1E1E);
+  static const Color darkSecondaryBackground = Color(0xFF262626);
+  static const Color darkBorder = Color(0xFF333333);
+  static const Color darkPlaceholder = Color(0xFF757575);
+  static const Color darkTextPrimary = Color(0xFFF5F5F5);
   static Color darkTextSecondary = darkTextPrimary.withOpacity(0.6);
 
   // ===== Status =====
@@ -33,6 +33,12 @@ class AppColors {
   static const Color cream = Color(0xFFFFFAF3);
   static const Color peach = Color(0xFFFFF2DB);
   static const Color sand = Color(0xFFFFE5BF);
+
+  // ===== Event Manage UI =====
+  static const Color accentPink = Color(0xFFE94057);
+  static const Color accentBlue = Color(0xFF2848D6);
+  static const Color softBlue = Color(0xFF3B82F6);
+  static const Color pageBackground = Color(0xFFF5F5F7);
 
   static const LinearGradient splashGradient = LinearGradient(
     begin: Alignment.topCenter,
@@ -55,4 +61,12 @@ extension ThemeColors on BuildContext {
 
   Color shadowColor([double opacity = 0.06]) =>
       isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(opacity);
+
+  Color get pageScaffoldColor => isDark ? AppColors.darkBackground : AppColors.pageBackground;
+
+  BoxDecoration get cardDecoration => BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: border, width: 1),
+      );
 }

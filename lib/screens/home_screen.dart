@@ -43,12 +43,14 @@ class HomeScreenState extends State<HomeScreen> {
 
   List<Event> _filterEvents(List<Event> events) {
     return events.where((e) {
-      final matchQuery = _query.isEmpty ||
+      final matchQuery =
+          _query.isEmpty ||
           e.title.toLowerCase().contains(_query) ||
           e.organizerName.toLowerCase().contains(_query) ||
           (e.category ?? '').toLowerCase().contains(_query) ||
           (e.tagline ?? '').toLowerCase().contains(_query);
-      final matchCategory = _selectedCategory == null ||
+      final matchCategory =
+          _selectedCategory == null ||
           _selectedCategory == 'Semua' ||
           (e.category ?? '').toLowerCase() == _selectedCategory!.toLowerCase();
       return matchQuery && matchCategory;
@@ -69,7 +71,7 @@ class HomeScreenState extends State<HomeScreen> {
           ..sort((a, b) => b.participantCount.compareTo(a.participantCount));
         final top = popular.take(3).toList();
         return SizedBox(
-          height: 400,
+          height: 366,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -107,10 +109,13 @@ class HomeScreenState extends State<HomeScreen> {
           onRefresh: refresh,
           child: CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(child: _HeaderSection(
-                searchController: _searchController,
-                onSearchChanged: (v) => setState(() => _query = v.toLowerCase()),
-              )),
+              SliverToBoxAdapter(
+                child: _HeaderSection(
+                  searchController: _searchController,
+                  onSearchChanged: (v) =>
+                      setState(() => _query = v.toLowerCase()),
+                ),
+              ),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
@@ -195,27 +200,19 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               // ─── Category Filter ───
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 12),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
               SliverToBoxAdapter(
                 child: _CategoryFilter(
                   selected: _selectedCategory,
                   onSelected: (cat) => setState(() => _selectedCategory = cat),
                 ),
               ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 12),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
               SliverToBoxAdapter(
-                child: _SectionHeader(
-                  title: 'Event Terpopuler',
-                ),
+                child: _SectionHeader(title: 'Event Terpopuler'),
               ),
               // Terpopuler: horizontal scroll, top by participantCount
-              SliverToBoxAdapter(
-                child: _buildTerpopulerSection(),
-              ),
+              SliverToBoxAdapter(child: _buildTerpopulerSection()),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               SliverToBoxAdapter(
                 child: _SectionHeader(
@@ -235,7 +232,11 @@ class HomeScreenState extends State<HomeScreen> {
                         child: Padding(
                           padding: EdgeInsets.only(top: 40),
                           child: Center(
-                            child: SizedBox(width: 100, height: 100, child: LottieLoading()),
+                            child: SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: LottieLoading(),
+                            ),
                           ),
                         ),
                       );
@@ -260,7 +261,11 @@ class HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.event_busy_rounded, size: 40, color: context.textSecondary),
+                              Icon(
+                                Icons.event_busy_rounded,
+                                size: 40,
+                                color: context.textSecondary,
+                              ),
                               const SizedBox(height: 10),
                               Text(
                                 allEvents.isEmpty
@@ -296,6 +301,28 @@ class _EventCard extends StatelessWidget {
   final Event event;
   const _EventCard({required this.event});
 
+  String _formatDate(DateTime start, DateTime? end) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    String dayLabel(DateTime d) =>
+        '${d.day} ${months[d.month - 1].toLowerCase()}';
+    return end != null
+        ? '${dayLabel(start)} - ${dayLabel(end)} ${end.year}'
+        : '${dayLabel(start)} ${start.year}';
+  }
+
   Color get _categoryColor {
     switch ((event.category ?? '').toLowerCase()) {
       case 'workshop':
@@ -313,6 +340,18 @@ class _EventCard extends StatelessWidget {
     }
   }
 
+  Widget _avatarDot(BuildContext context) {
+    return Container(
+      width: 14,
+      height: 14,
+      decoration: BoxDecoration(
+        color: context.textSecondary.withOpacity(0.35),
+        shape: BoxShape.circle,
+        border: Border.all(color: context.surface, width: 1.5),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -327,103 +366,117 @@ class _EventCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: context.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border, width: 0.8),
+          border: Border.all(color: context.border, width: 1),
         ),
-        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ─── Banner Image + Overlays ───
-            SizedBox(
-              height: 190,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Background / Image
-                  if (event.bannerUrl != null)
-                    Image.network(event.bannerUrl!, fit: BoxFit.cover)
-                  else
-                    Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFFF2DB), Color(0xFFE5BF), Color(0xFFFAF3)],
+            // ─── Banner ───
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+              child: SizedBox(
+                height: 140,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (event.bannerUrl != null)
+                      Image.network(event.bannerUrl!, fit: BoxFit.cover)
+                    else
+                      Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFF2DB),
+                              Color(0xFFE5BF),
+                              Color(0xFFFAF3),
+                            ],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 40,
+                            color: Colors.white70,
+                          ),
                         ),
                       ),
-                      child: const Center(
-                        child: Icon(Icons.image_outlined, size: 40, color: Colors.white70),
-                      ),
-                    ),
 
-                  // Gradient overlay bottom
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: 60,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.transparent, Colors.black.withOpacity(0.25)],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Badge kategori — top left
-                  if (event.category != null)
+                    // Gradient overlay bottom
                     Positioned(
-                      top: 12,
-                      left: 12,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: 44,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.92),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 7,
-                              height: 7,
-                              decoration: BoxDecoration(
-                                color: _categoryColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              event.category!.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                color: _categoryColor,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.3),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                ],
+
+                    // Badge kategori — top left
+                    if (event.category != null)
+                      Positioned(
+                        top: 12,
+                        left: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.92),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.border,
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: _categoryColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                event.category!.toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: _categoryColor,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
 
             // ─── Content ───
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -433,6 +486,7 @@ class _EventCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
+                      fontFamily: 'Poppins',
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: context.textPrimary,
@@ -440,46 +494,48 @@ class _EventCard extends StatelessWidget {
                     ),
                   ),
                   if (event.tagline != null && event.tagline!.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       event.tagline!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 12,
                         fontStyle: FontStyle.italic,
                         color: context.textSecondary,
                       ),
                     ),
                   ],
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
 
                   // Date & Location row
                   Row(
                     children: [
-                      Icon(AppIcons.calendar, size: 14, color: context.textSecondary),
-                      const SizedBox(width: 5),
-                      Text(
-                        '${event.startDate.day}/${event.startDate.month}/${event.startDate.year}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: context.textSecondary,
-                        ),
+                      Icon(
+                        AppIcons.calendar,
+                        size: 14,
+                        color: context.textSecondary,
                       ),
-                      if (event.endDate != null) ...[
-                        Text(
-                          ' — ${event.endDate!.day}/${event.endDate!.month}/${event.endDate!.year}',
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          _formatDate(event.startDate, event.endDate),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: context.textSecondary,
                           ),
                         ),
-                      ],
-                      const Spacer(),
+                      ),
                       if (event.location != null) ...[
-                        Icon(AppIcons.location, size: 14, color: context.textSecondary),
+                        const SizedBox(width: 10),
+                        Icon(
+                          AppIcons.location,
+                          size: 14,
+                          color: context.textSecondary,
+                        ),
                         const SizedBox(width: 4),
                         Flexible(
                           child: Text(
@@ -496,20 +552,28 @@ class _EventCard extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
                   // Organizer
                   Row(
                     children: [
-                      Icon(Icons.business_center_rounded, size: 13, color: context.textSecondary),
+                      Icon(
+                        Icons.business_center_rounded,
+                        size: 13,
+                        color: context.textSecondary,
+                      ),
                       const SizedBox(width: 5),
-                      Text(
-                        event.organizerName.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: context.textSecondary,
-                          letterSpacing: 0.8,
+                      Flexible(
+                        child: Text(
+                          event.organizerName.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: context.textSecondary,
+                            letterSpacing: 0.8,
+                          ),
                         ),
                       ),
                     ],
@@ -520,79 +584,76 @@ class _EventCard extends StatelessWidget {
 
             // ─── Divider ───
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Container(
-                height: 1,
-                color: AppColors.border,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Container(height: 1, color: context.border),
             ),
 
             // ─── Footer ───
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-              child: Row(
-                children: [
-                  // Participants
-                  Icon(Icons.people_rounded, size: 16, color: context.textSecondary),
-                  const SizedBox(width: 5),
-                  Text(
-                    '${event.participantCount} peserta',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: context.textSecondary,
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  // Free badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'Free',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.success,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              child: SizedBox(
+                height: 34,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 30,
+                      height: 22,
+                      child: Stack(
+                        children: [
+                          Positioned(left: 0, top: 4, child: _avatarDot(context)),
+                          Positioned(left: 8, top: 4, child: _avatarDot(context)),
+                          Positioned(left: 16, top: 4, child: _avatarDot(context)),
+                        ],
                       ),
                     ),
-                  ),
-
-                  const Spacer(),
-
-                  // Lihat Detail button (wider)
-                  Container(
-                    height: 34,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, Color(0xFFD81336)],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.25),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Lihat Detail',
+                    const SizedBox(width: 6),
+                    Text(
+                      '${event.participantCount} peserta',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        color: context.textSecondary,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    Container(
+                      height: 26,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Free',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.success,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      height: 34,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Lihat Detail',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -632,7 +693,7 @@ class _SectionHeader extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: AppColors.accentBlue,
                 ),
               ),
             ),
@@ -646,7 +707,10 @@ class _AllEventsSheet extends StatelessWidget {
   final Future<List<Event>> eventsFuture;
   final List<Event> Function(List<Event>) filterEvents;
 
-  const _AllEventsSheet({required this.eventsFuture, required this.filterEvents});
+  const _AllEventsSheet({
+    required this.eventsFuture,
+    required this.filterEvents,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -679,7 +743,11 @@ class _AllEventsSheet extends StatelessWidget {
                   children: [
                     Text(
                       'Semua Event',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.textPrimary),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: context.textPrimary,
+                      ),
                     ),
                     const Spacer(),
                     GestureDetector(
@@ -690,7 +758,11 @@ class _AllEventsSheet extends StatelessWidget {
                           color: context.textSecondary.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.close, size: 18, color: context.textSecondary),
+                        child: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: context.textSecondary,
+                        ),
                       ),
                     ),
                   ],
@@ -714,19 +786,30 @@ class _AllEventsSheet extends StatelessWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.event_busy_rounded, size: 36, color: context.textSecondary),
+                            Icon(
+                              Icons.event_busy_rounded,
+                              size: 36,
+                              color: context.textSecondary,
+                            ),
                             const SizedBox(height: 8),
-                            Text('Tidak ada event yang cocok', style: TextStyle(color: context.textSecondary)),
+                            Text(
+                              'Tidak ada event yang cocok',
+                              style: TextStyle(color: context.textSecondary),
+                            ),
                           ],
                         ),
                       );
                     }
                     return ListView.separated(
                       controller: scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                       itemCount: events.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) => _EventCard(event: events[index]),
+                      itemBuilder: (context, index) =>
+                          _EventCard(event: events[index]),
                     );
                   },
                 ),
@@ -747,11 +830,27 @@ class _CategoryFilter extends StatelessWidget {
 
   static const _categories = [
     {'label': 'Semua', 'icon': Icons.grid_view_rounded, 'color': null},
-    {'label': 'Workshop', 'icon': Icons.build_rounded, 'color': Color(0xFFE97A2B)},
+    {
+      'label': 'Workshop',
+      'icon': Icons.build_rounded,
+      'color': Color(0xFFE97A2B),
+    },
     {'label': 'Seminar', 'icon': Icons.mic_rounded, 'color': Color(0xFF3B82F6)},
-    {'label': 'Lomba', 'icon': Icons.emoji_events_rounded, 'color': Color(0xFF8B5CF6)},
-    {'label': 'Olahraga', 'icon': Icons.sports_soccer_rounded, 'color': Color(0xFF22C55E)},
-    {'label': 'Sosial', 'icon': Icons.favorite_rounded, 'color': Color(0xFFEC4899)},
+    {
+      'label': 'Lomba',
+      'icon': Icons.emoji_events_rounded,
+      'color': Color(0xFF8B5CF6),
+    },
+    {
+      'label': 'Olahraga',
+      'icon': Icons.sports_soccer_rounded,
+      'color': Color(0xFF22C55E),
+    },
+    {
+      'label': 'Sosial',
+      'icon': Icons.favorite_rounded,
+      'color': Color(0xFFEC4899),
+    },
   ];
 
   @override
@@ -765,7 +864,9 @@ class _CategoryFilter extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final cat = _categories[i];
-          final isActive = (selected == null && cat['label'] == 'Semua') || selected == cat['label'];
+          final isActive =
+              (selected == null && cat['label'] == 'Semua') ||
+              selected == cat['label'];
           final color = cat['color'] as Color?;
 
           return GestureDetector(
@@ -784,15 +885,6 @@ class _CategoryFilter extends StatelessWidget {
                       : AppColors.border,
                   width: isActive ? 1.5 : 1,
                 ),
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: (color ?? AppColors.primary).withOpacity(0.25),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : [],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -874,87 +966,84 @@ class _HeaderSection extends StatelessWidget {
               child: _decorCircle(45, const Color(0xFFE5BF).withOpacity(0.10)),
             ),
             Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'TapEvent',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_none_rounded,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Temukan dan ikuti event kampusmu',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.white.withOpacity(0.85),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFFAF3),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.10),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(
-                      AppIcons.search,
-                      color: context.textSecondary,
-                      size: 20,
+                    const Text(
+                      'TapEvent',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: onSearchChanged,
-                        style: const TextStyle(fontSize: 14, color: Color(0xFF1D1D1D)),
-                        decoration: InputDecoration(
-                          hintText: 'Cari event...',
-                          hintStyle: TextStyle(
-                            color: context.textSecondary,
-                            fontSize: 14,
-                          ),
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.notifications_none_rounded,
+                        color: Colors.white,
+                        size: 22,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
+                const SizedBox(height: 4),
+                Text(
+                  'Temukan dan ikuti event kampusmu',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withOpacity(0.85),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFAF3),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        AppIcons.search,
+                        color: context.textSecondary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: searchController,
+                          onChanged: onSearchChanged,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF1D1D1D),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Cari event...',
+                            hintStyle: TextStyle(
+                              color: context.textSecondary,
+                              fontSize: 14,
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

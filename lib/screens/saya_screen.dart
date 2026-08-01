@@ -45,7 +45,7 @@ class _SayaScreenState extends State<SayaScreen> {
     final isDark = context.isDark;
 
     return Scaffold(
-      backgroundColor: context.bg,
+      backgroundColor: context.pageScaffoldColor,
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -72,7 +72,7 @@ class _SayaScreenState extends State<SayaScreen> {
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFFF62440), Color(0xFFD81336), Color(0xFFB80E2C)],
+                            colors: [AppColors.accentPink, AppColors.accentBlue],
                           ),
                         ),
                         child: ClipRRect(
@@ -194,12 +194,9 @@ class _SayaScreenState extends State<SayaScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: AppColors.primary.withOpacity(0.2),
-                                width: 1.5,
-                              ),
+                              color: AppColors.accentBlue.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: context.border, width: 1),
                             ),
                             child: Row(
                               children: [
@@ -207,7 +204,7 @@ class _SayaScreenState extends State<SayaScreen> {
                                   width: 50,
                                   height: 50,
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary,
+                                    color: AppColors.accentBlue,
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: const Icon(
@@ -257,81 +254,83 @@ class _SayaScreenState extends State<SayaScreen> {
 
             const SizedBox(height: 20),
             _SectionLabel('Akun'),
-            _MenuTile(
-              icon: Icons.person_outline_rounded,
-              label: 'Data Pribadi',
-              onTap: () async {
-                final profile = await _profileFuture;
-                if (profile == null || !mounted) return;
-                await Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen(profile: profile)));
-                setState(_load);
-              },
-            ),
-            _MenuTile(
-              icon: Icons.lock_outline_rounded,
-              label: 'Keamanan',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
-              },
+            _MenuCard(
+              children: [
+                _MenuTile(
+                  icon: Icons.person_outline_rounded,
+                  label: 'Data Pribadi',
+                  onTap: () async {
+                    final profile = await _profileFuture;
+                    if (profile == null || !mounted) return;
+                    await Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen(profile: profile)));
+                    setState(_load);
+                  },
+                ),
+                _MenuTile(
+                  icon: Icons.lock_outline_rounded,
+                  label: 'Keamanan',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
+                  },
+                ),
+              ],
             ),
 
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(height: 1, color: AppColors.border),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
             _SectionLabel('Preferensi'),
-            _DarkModeTile(isDark: isDark),
+            _MenuCard(
+              children: [
+                _DarkModeTile(isDark: isDark),
+              ],
+            ),
 
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(height: 1, color: AppColors.border),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
             _SectionLabel('Lainnya'),
-            _MenuTile(
-              icon: Icons.privacy_tip_outlined,
-              label: 'Kebijakan & Privasi',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const StaticInfoScreen(
-                    title: 'Kebijakan & Privasi',
-                    description: 'Informasi mengenai privasi dan data pengguna',
-                    content: 'Konten kebijakan privasi TapEvent akan ditambahkan di sini.',
+            _MenuCard(
+              children: [
+                _MenuTile(
+                  icon: Icons.privacy_tip_outlined,
+                  label: 'Kebijakan & Privasi',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StaticInfoScreen(
+                        title: 'Kebijakan & Privasi',
+                        description: 'Informasi mengenai privasi dan data pengguna',
+                        content: 'Konten kebijakan privasi TapEvent akan ditambahkan di sini.',
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            _MenuTile(
-              icon: Icons.help_outline_rounded,
-              label: 'Bantuan',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const StaticInfoScreen(
-                    title: 'Bantuan',
-                    description: 'Pusat bantuan dan pertanyaan umum',
-                    content: 'Halaman bantuan/FAQ TapEvent akan ditambahkan di sini.',
+                _MenuTile(
+                  icon: Icons.help_outline_rounded,
+                  label: 'Bantuan',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StaticInfoScreen(
+                        title: 'Bantuan',
+                        description: 'Pusat bantuan dan pertanyaan umum',
+                        content: 'Halaman bantuan/FAQ TapEvent akan ditambahkan di sini.',
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            _MenuTile(
-              icon: Icons.info_outline_rounded,
-              label: 'Tentang Aplikasi',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const StaticInfoScreen(
-                    title: 'Tentang Aplikasi',
-                    description: 'Informasi mengenai aplikasi TapEvent',
-                    content: 'TapEvent — Digital Campus Event Management Platform.',
+                _MenuTile(
+                  icon: Icons.info_outline_rounded,
+                  label: 'Tentang Aplikasi',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StaticInfoScreen(
+                        title: 'Tentang Aplikasi',
+                        description: 'Informasi mengenai aplikasi TapEvent',
+                        content: 'TapEvent — Digital Campus Event Management Platform.',
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
 
             const SizedBox(height: 20),
@@ -342,16 +341,16 @@ class _SayaScreenState extends State<SayaScreen> {
                 height: 48,
                 child: OutlinedButton.icon(
                   onPressed: _logout,
-                  icon: Icon(AppIcons.logout, color: AppColors.primary, size: 18),
-                  label: Text('Logout', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                  icon: Icon(AppIcons.logout, color: AppColors.error, size: 18),
+                  label: Text('Logout', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.primary),
+                    side: const BorderSide(color: AppColors.error),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -392,6 +391,30 @@ class _SectionLabel extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: context.textSecondary),
+      ),
+    );
+  }
+}
+
+class _MenuCard extends StatelessWidget {
+  final List<Widget> children;
+  const _MenuCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: context.cardDecoration,
+        child: Column(
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0) const Divider(height: 1, indent: 56, endIndent: 20),
+              children[i],
+            ],
+          ],
+        ),
       ),
     );
   }

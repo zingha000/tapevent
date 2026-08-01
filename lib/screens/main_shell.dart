@@ -44,18 +44,9 @@ class _MainShellState extends State<MainShell> {
         decoration: BoxDecoration(
           color: context.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 16,
-              offset: const Offset(0, -3),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, -1),
-            ),
-          ],
+          border: Border(
+            top: BorderSide(color: context.border, width: 1),
+          ),
         ),
         child: SafeArea(
           child: Padding(

@@ -108,7 +108,7 @@ class _QrScanScreenState extends State<QrScanScreen> with TickerProviderStateMix
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Scan Absen'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.accentBlue,
         foregroundColor: Colors.white,
       ),
       body: Stack(

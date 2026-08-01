@@ -143,130 +143,208 @@ class _EventEditScreenState extends State<EventEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.bg,
-      appBar: AppBar(
-        title: const Text('Edit Event'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
+      backgroundColor: context.pageScaffoldColor,
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(bottom: 32),
         children: [
-          InkWell(
-            onTap: _pickBanner,
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: 160,
-              width: double.infinity,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: AppColors.sand,
-                borderRadius: BorderRadius.circular(16),
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.accentPink, AppColors.accentBlue],
               ),
-              child: _newBannerBytes != null
-                  ? Image.memory(_newBannerBytes!, fit: BoxFit.cover)
-                  : (widget.event.bannerUrl != null
-                        ? Image.network(
-                            widget.event.bannerUrl!,
-                            fit: BoxFit.cover,
-                          )
-                        : const Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.add_photo_alternate_outlined,
-                                  size: 32,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Ketuk untuk unggah banner',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          )),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(28),
+              ),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              12,
+              MediaQuery.paddingOf(context).top + 8,
+              20,
+              28,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.22),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.22),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Edit Event',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Perbarui Detail Event',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Ketuk gambar di atas untuk mengganti banner',
-            style: TextStyle(fontSize: 11, color: context.textSecondary),
-          ),
-          const SizedBox(height: 20),
-
-          _Label('Judul Event'),
-          TextField(
-            controller: _titleController,
-            decoration: _decoration('Judul event'),
-          ),
-          const SizedBox(height: 16),
-
-          _Label('Tagline'),
-          TextField(
-            controller: _taglineController,
-            decoration: _decoration('Opsional'),
-          ),
-          const SizedBox(height: 16),
-
-          _Label('Deskripsi'),
-          TextField(
-            controller: _descriptionController,
-            maxLines: 4,
-            decoration: _decoration('Deskripsi event'),
-          ),
-          const SizedBox(height: 16),
-
-          _Label('Lokasi'),
-          TextField(
-            controller: _locationController,
-            decoration: _decoration('Lokasi event'),
-          ),
-          const SizedBox(height: 16),
-
-          _Label('Nama Organisasi/Ormawa'),
-          TextField(
-            controller: _organizerController,
-            decoration: _decoration('Nama organisasi'),
-          ),
-          const SizedBox(height: 16),
-
-          _Label('Contact Person'),
-          TextField(
-            controller: _contactController,
-            decoration: _decoration('Nomor kontak'),
-          ),
-          const SizedBox(height: 28),
-
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isSaving ? null : _save,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: _pickBanner,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    height: 160,
+                    width: double.infinity,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: AppColors.sand,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: _newBannerBytes != null
+                        ? Image.memory(_newBannerBytes!, fit: BoxFit.cover)
+                        : (widget.event.bannerUrl != null
+                              ? Image.network(
+                                  widget.event.bannerUrl!,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.add_photo_alternate_outlined,
+                                        size: 32,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Ketuk untuk unggah banner',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                  ),
                 ),
-              ),
-              child: _isSaving
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.4,
-                        color: Colors.white,
+                const SizedBox(height: 8),
+                Text(
+                  'Ketuk gambar di atas untuk mengganti banner',
+                  style: TextStyle(fontSize: 11, color: context.textSecondary),
+                ),
+                const SizedBox(height: 20),
+
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: context.cardDecoration,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _Label('Judul Event'),
+                      TextField(
+                        controller: _titleController,
+                        decoration: _decoration('Judul event'),
                       ),
-                    )
-                  : const Text(
-                      'Simpan Perubahan',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(height: 16),
+
+                      _Label('Tagline'),
+                      TextField(
+                        controller: _taglineController,
+                        decoration: _decoration('Opsional'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Deskripsi'),
+                      TextField(
+                        controller: _descriptionController,
+                        maxLines: 4,
+                        decoration: _decoration('Deskripsi event'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Lokasi'),
+                      TextField(
+                        controller: _locationController,
+                        decoration: _decoration('Lokasi event'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Nama Organisasi/Ormawa'),
+                      TextField(
+                        controller: _organizerController,
+                        decoration: _decoration('Nama organisasi'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Contact Person'),
+                      TextField(
+                        controller: _contactController,
+                        decoration: _decoration('Nomor kontak'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _isSaving ? null : _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentBlue,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.4,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Simpan Perubahan',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -279,7 +357,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
       hintText: hint,
       hintStyle: TextStyle(color: context.textSecondary, fontSize: 14),
       filled: true,
-      fillColor: context.surface,
+      fillColor: context.bg,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -291,7 +369,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.accentBlue, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

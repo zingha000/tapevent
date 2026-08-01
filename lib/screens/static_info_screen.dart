@@ -15,7 +15,7 @@ class StaticInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.pageScaffoldColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,7 +26,7 @@ class StaticInfoScreen extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+                    icon: Icon(Icons.arrow_back_rounded, color: context.textPrimary),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const Spacer(),
@@ -62,7 +62,7 @@ class StaticInfoScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(height: 1, color: AppColors.border),
+              child: Container(height: 1, color: context.border),
             ),
             const SizedBox(height: 20),
 

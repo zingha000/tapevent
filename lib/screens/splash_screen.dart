@@ -65,13 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
                     decoration: BoxDecoration(
                       color: context.surface,
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.shadowColor(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: const Icon(
                       Icons.qr_code_scanner_rounded,

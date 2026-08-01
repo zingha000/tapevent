@@ -90,7 +90,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.bg,
+      backgroundColor: context.pageScaffoldColor,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refresh,
@@ -142,11 +142,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: context.surface,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: AppColors.border, width: 0.8),
-                          ),
+                          decoration: context.cardDecoration,
                           child: Row(
                             children: [
                               Expanded(
@@ -195,7 +191,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                                   icon: const Icon(Icons.download_rounded, size: 18),
                                   label: const Text('Unduh', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2563EB),
+                                    backgroundColor: AppColors.accentBlue,
                                     foregroundColor: Colors.white,
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -213,7 +209,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
                 sliver: FutureBuilder<List<Event>>(
                   future: _historyFuture,
                   builder: (context, snapshot) {
@@ -273,11 +269,12 @@ class _HistoryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border, width: 0.8),
+        color: context.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         child: Material(
           color: context.surface,
           child: InkWell(
@@ -294,7 +291,7 @@ class _HistoryCard extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFFF2DB), Color(0xFFE5BF), Color(0xFFFAF3)],
+                      colors: [AppColors.accentPink, AppColors.accentBlue],
                     ),
                   ),
                   child: Stack(

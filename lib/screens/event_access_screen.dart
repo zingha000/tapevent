@@ -140,13 +140,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
           decoration: BoxDecoration(
             color: context.surface,
             borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 30,
-                offset: const Offset(0, 12),
-              ),
-            ],
+            border: Border.all(color: context.border, width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -156,10 +150,10 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.accentBlue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Icon(Icons.vpn_key_rounded, color: AppColors.primary, size: 28),
+                child: const Icon(Icons.vpn_key_rounded, color: AppColors.accentBlue, size: 28),
               ),
               const SizedBox(height: 16),
               Text(
@@ -177,17 +171,17 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: AppColors.accentBlue.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline_rounded, size: 16, color: AppColors.primary),
+                    Icon(Icons.info_outline_rounded, size: 16, color: AppColors.accentBlue),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Kode akses ini hanya ditampilkan sekali. Salin dan simpan dengan baik.',
-                        style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.3),
+                        style: TextStyle(fontSize: 12, color: AppColors.accentBlue, height: 1.3),
                       ),
                     ),
                   ],
@@ -200,7 +194,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 decoration: BoxDecoration(
                   color: context.bg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                  border: Border.all(color: AppColors.accentBlue.withOpacity(0.2)),
                 ),
                 child: Text(
                   _accessCode.toUpperCase(),
@@ -209,7 +203,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                     fontSize: 24,
                     letterSpacing: 4,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
+                    color: AppColors.accentBlue,
                   ),
                 ),
               ),
@@ -222,17 +216,17 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                   icon: Icon(
                     _copied ? Icons.check_rounded : Icons.copy_rounded,
                     size: 18,
-                    color: _copied ? AppColors.success : AppColors.primary,
+                    color: _copied ? AppColors.success : AppColors.accentBlue,
                   ),
                   label: Text(
                     _copied ? 'Tersalin' : 'Salin Kode',
                     style: TextStyle(
-                      color: _copied ? AppColors.success : AppColors.primary,
+                      color: _copied ? AppColors.success : AppColors.accentBlue,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: _copied ? AppColors.success : AppColors.primary),
+                    side: BorderSide(color: _copied ? AppColors.success : AppColors.accentBlue),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -247,15 +241,15 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accentBlue),
                         )
-                      : const Icon(Icons.refresh_rounded, size: 18, color: AppColors.primary),
+                      : const Icon(Icons.refresh_rounded, size: 18, color: AppColors.accentBlue),
                   label: const Text(
                     'Buat Kode Baru',
-                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: AppColors.accentBlue, fontWeight: FontWeight.w600),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.primary),
+                    side: const BorderSide(color: AppColors.accentBlue),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -270,7 +264,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                     Navigator.of(context).pop(updated);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.accentBlue,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
@@ -353,13 +347,7 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
           decoration: BoxDecoration(
             color: context.surface,
             borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 30,
-                offset: const Offset(0, 12),
-              ),
-            ],
+            border: Border.all(color: context.border, width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -369,10 +357,10 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.accentBlue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 28),
+                child: const Icon(Icons.lock_outline_rounded, color: AppColors.accentBlue, size: 28),
               ),
               const SizedBox(height: 16),
               Text(
@@ -410,7 +398,7 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                    borderSide: const BorderSide(color: AppColors.accentBlue, width: 1.5),
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -442,7 +430,7 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.accentBlue,
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
