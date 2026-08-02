@@ -86,7 +86,7 @@ class EventService {
       'start_date': startDate.toIso8601String(),
       'end_date': endDate?.toIso8601String(),
       'max_participants': maxParticipants,
-      if (location != null) 'location': location,
+      'location': ?location,
       'organizer_name': organizerName,
       'contact_person': contactPerson,
       'registration_form_url': registrationFormUrl,
@@ -95,7 +95,7 @@ class EventService {
       'qr_secret': _generateQrSecret(),
       'status': 'pending',
       'access_code': _generateRandomCode(),
-    }).select().single() as Map<String, dynamic>;
+    }).select().single();
     return Event.fromJson(data);
   }
 

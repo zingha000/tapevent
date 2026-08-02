@@ -57,7 +57,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     ];
     for (var i = 0; i < events.length; i++) {
       final e = events[i];
-      final start = e.startDate != null ? '${e.startDate!.day}/${e.startDate!.month}/${e.startDate!.year}' : '-';
+      final start = '${e.startDate!.day}/${e.startDate!.month}/${e.startDate!.year}';
       final end = e.endDate != null ? '${e.endDate!.day}/${e.endDate!.month}/${e.endDate!.year}' : '-';
       rows.add([
         '${i + 1}',
@@ -304,7 +304,7 @@ class _HistoryCard extends StatelessWidget {
                           height: 60,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.08),
+                            color: AppColors.primary.withValues(alpha: 0.08),
                           ),
                         ),
                       ),
@@ -316,7 +316,7 @@ class _HistoryCard extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.06),
+                            color: AppColors.primary.withValues(alpha: 0.06),
                           ),
                         ),
                       ),
@@ -356,7 +356,7 @@ class _HistoryCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
+                          color: Colors.green.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(

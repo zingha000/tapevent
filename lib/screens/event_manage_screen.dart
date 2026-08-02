@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:js_interop';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -12,7 +11,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
-import 'package:web/web.dart' as web;
+import '../web/pdf_web_stub.dart'
+    if (dart.library.js_interop) '../web/pdf_web.dart';
 import '../models/event.dart';
 import '../theme/app_colors.dart';
 import '../main.dart' show supabase;
@@ -137,7 +137,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Akhiri Event',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -273,7 +273,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Hapus Event',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -371,8 +371,9 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 height: 46,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (reasonController.text.trim().isEmpty)
+                                    if (reasonController.text.trim().isEmpty) {
                                       return;
+                                    }
                                     Navigator.of(context).pop(true);
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -427,7 +428,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Ganti Kode Akses',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -458,7 +459,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.accentBlue.withOpacity(0.1),
+                            color: AppColors.accentBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: const Icon(Icons.vpn_key_rounded, color: AppColors.accentBlue, size: 28),
@@ -470,7 +471,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.accentBlue.withOpacity(0.08),
+                            color: AppColors.accentBlue.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -560,7 +561,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'Kode Baru',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -591,7 +592,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.success.withOpacity(0.1),
+                            color: AppColors.success.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: const Icon(Icons.check_rounded, color: AppColors.success, size: 28),
@@ -603,7 +604,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.08),
+                            color: Colors.orange.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -627,7 +628,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           decoration: BoxDecoration(
                             color: context.bg,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.accentBlue.withOpacity(0.3)),
+                            border: Border.all(color: AppColors.accentBlue.withValues(alpha: 0.3)),
                           ),
                           child: Text(
                             newCode.toUpperCase(),
@@ -684,7 +685,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Aksi',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -714,7 +715,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.accentBlue.withOpacity(0.1),
+                            color: AppColors.accentBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: const Icon(Icons.more_horiz_rounded, color: AppColors.accentBlue, size: 28),
@@ -791,7 +792,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'QR Absensi',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -1022,17 +1023,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
   }
 
   void _downloadPdfOnWeb(Uint8List bytes, String filename) {
-    final blob = web.Blob(
-      [bytes.toJS].toJS,
-      web.BlobPropertyBag(type: 'application/pdf'),
-    );
-    final url = web.URL.createObjectURL(blob);
-    final anchor = web.HTMLAnchorElement()
-      ..href = url
-      ..download = filename;
-    web.window.document.body?.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
+    downloadPdfOnWeb(bytes, filename);
   }
 
   Future<void> _dropParticipant(Map<String, dynamic> participant) async {
@@ -1043,7 +1034,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Hapus Peserta',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -1141,8 +1132,9 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                 height: 46,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (reasonController.text.trim().isEmpty)
+                                    if (reasonController.text.trim().isEmpty) {
                                       return;
+                                    }
                                     Navigator.of(context).pop(true);
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -1296,7 +1288,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.22),
+                      color: Colors.white.withValues(alpha: 0.22),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
@@ -1357,7 +1349,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.6),
+                            Colors.black.withValues(alpha: 0.6),
                           ],
                           stops: [0.55, 1.0],
                         ),
@@ -1725,7 +1717,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       return Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                           ),
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -1788,8 +1780,8 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: hasAttended
-                                              ? Colors.green.withOpacity(0.1)
-                                              : Colors.grey.withOpacity(0.1),
+                                              ? Colors.green.withValues(alpha: 0.1)
+                                              : Colors.grey.withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -1816,7 +1808,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                                   ),
                                               decoration: BoxDecoration(
                                                 color: Colors.orange
-                                                    .withOpacity(0.12),
+                                                    .withValues(alpha: 0.12),
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                               ),
@@ -1942,7 +1934,7 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       }
                       return Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black.withOpacity(0.08)),
+                          border: Border.all(color: Colors.black.withValues(alpha: 0.08)),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         clipBehavior: Clip.antiAlias,
@@ -2002,8 +1994,8 @@ class _EventManageScreenState extends State<EventManageScreen> {
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: isCreator
-                                            ? AppColors.primary.withOpacity(0.1)
-                                            : Colors.blue.withOpacity(0.1),
+                                            ? AppColors.primary.withValues(alpha: 0.1)
+                                            : Colors.blue.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
@@ -2321,7 +2313,7 @@ class _QrDialogWidgetState extends State<_QrDialogWidget> {
                         strokeWidth: 2,
                         value: _secondsLeft / 5,
                         color: AppColors.accentBlue,
-                        backgroundColor: AppColors.accentBlue.withOpacity(0.15),
+                        backgroundColor: AppColors.accentBlue.withValues(alpha: 0.15),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -2340,7 +2332,7 @@ class _QrDialogWidgetState extends State<_QrDialogWidget> {
                 'Tunjukkan QR ini ke peserta untuk absen',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 16),

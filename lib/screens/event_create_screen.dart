@@ -66,12 +66,12 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         data: Theme.of(context).copyWith(
           datePickerTheme: DatePickerThemeData(
             todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
-            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withOpacity(0.1)),
+            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withValues(alpha: 0.1)),
             dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) return AppColors.primary;
               return null;
             }),
-            rangeSelectionBackgroundColor: AppColors.primary.withOpacity(0.1),
+            rangeSelectionBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
             headerBackgroundColor: AppColors.primary,
             headerForegroundColor: Colors.white,
             dayForegroundColor: WidgetStateProperty.resolveWith((states) {
@@ -109,12 +109,12 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
         data: Theme.of(context).copyWith(
           datePickerTheme: DatePickerThemeData(
             todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
-            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withOpacity(0.1)),
+            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withValues(alpha: 0.1)),
             dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) return AppColors.primary;
               return null;
             }),
-            rangeSelectionBackgroundColor: AppColors.primary.withOpacity(0.1),
+            rangeSelectionBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
             headerBackgroundColor: AppColors.primary,
             headerForegroundColor: Colors.white,
             dayForegroundColor: WidgetStateProperty.resolveWith((states) {
@@ -299,7 +299,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.08),
+                              color: AppColors.primary.withValues(alpha: 0.08),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -367,7 +367,7 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
-                value: _category,
+                initialValue: _category,
                 decoration: _decoration('Pilih kategori'),
                 items: _categories
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))

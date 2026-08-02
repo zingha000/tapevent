@@ -1,6 +1,5 @@
 import '../main.dart' show supabase;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../main.dart' show supabase;
 
 class ProfileService {
   static Future<Map<String, dynamic>?> fetchMyProfile(String userId) async {

@@ -23,7 +23,7 @@ class AppColors {
   static const Color darkBorder = Color(0xFF333333);
   static const Color darkPlaceholder = Color(0xFF757575);
   static const Color darkTextPrimary = Color(0xFFF5F5F5);
-  static Color darkTextSecondary = darkTextPrimary.withOpacity(0.6);
+  static Color darkTextSecondary = darkTextPrimary.withValues(alpha: 0.6);
 
   // ===== Status =====
   static const Color success = Color(0xFF22C55E);
@@ -60,7 +60,7 @@ extension ThemeColors on BuildContext {
   Color get placeholderColor => isDark ? AppColors.darkPlaceholder : AppColors.placeholder;
 
   Color shadowColor([double opacity = 0.06]) =>
-      isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(opacity);
+      isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: opacity);
 
   Color get pageScaffoldColor => isDark ? AppColors.darkBackground : AppColors.pageBackground;
 

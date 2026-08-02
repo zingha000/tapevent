@@ -31,7 +31,7 @@ Future<Event?> _showCreatorFlow(BuildContext context, Event event) async {
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Kode Akses',
-    barrierColor: Colors.black.withOpacity(0.3),
+    barrierColor: Colors.black.withValues(alpha: 0.3),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
     transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -61,7 +61,7 @@ Future<Event?> _showEnterCodeDialog(BuildContext context, Event event) {
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Kode Akses',
-    barrierColor: Colors.black.withOpacity(0.3),
+    barrierColor: Colors.black.withValues(alpha: 0.3),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
     transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -150,7 +150,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.accentBlue.withOpacity(0.1),
+                  color: AppColors.accentBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Icon(Icons.vpn_key_rounded, color: AppColors.accentBlue, size: 28),
@@ -171,7 +171,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.accentBlue.withOpacity(0.08),
+                  color: AppColors.accentBlue.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -194,7 +194,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 decoration: BoxDecoration(
                   color: context.bg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.accentBlue.withOpacity(0.2)),
+                  border: Border.all(color: AppColors.accentBlue.withValues(alpha: 0.2)),
                 ),
                 child: Text(
                   _accessCode.toUpperCase(),
@@ -357,7 +357,7 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.accentBlue.withOpacity(0.1),
+                  color: AppColors.accentBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Icon(Icons.lock_outline_rounded, color: AppColors.accentBlue, size: 28),

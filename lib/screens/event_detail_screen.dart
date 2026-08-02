@@ -48,7 +48,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Ajukan Batal',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -200,7 +200,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: label,
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -230,7 +230,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
+                            color: Colors.orange.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: const Icon(Icons.hourglass_empty_rounded, color: Colors.orange, size: 28),
@@ -296,7 +296,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               padding: const EdgeInsets.only(left: 8, top: 4),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.25),
+                  color: Colors.black.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -310,7 +310,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 padding: const EdgeInsets.only(right: 8, top: 4),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withValues(alpha: 0.25),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -396,7 +396,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.accentBlue.withOpacity(0.1),
+                            color: AppColors.accentBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -427,7 +427,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             decoration: BoxDecoration(
-                              color: AppColors.accentBlue.withOpacity(0.1),
+                              color: AppColors.accentBlue.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: const Row(
@@ -639,7 +639,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.1),
+                                color: Colors.orange.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Center(
@@ -706,7 +706,7 @@ class _InfoRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.accentBlue.withOpacity(0.08),
+            color: AppColors.accentBlue.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 18, color: AppColors.accentBlue),

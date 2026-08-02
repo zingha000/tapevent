@@ -47,7 +47,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary
-                : AppColors.primary.withOpacity(0.5),
+                : AppColors.primary.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.center,

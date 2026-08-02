@@ -115,7 +115,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 52,
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                     backgroundImage: _avatarBytes != null
                         ? MemoryImage(_avatarBytes!)
                         : (_currentAvatarUrl != null
@@ -161,7 +161,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           TextField(
             enabled: false,
             controller: TextEditingController(text: widget.profile['email'] ?? ''),
-            decoration: _decoration().copyWith(fillColor: Colors.black.withOpacity(0.03)),
+            decoration: _decoration().copyWith(fillColor: Colors.black.withValues(alpha: 0.03)),
           ),
           const SizedBox(height: 4),
           Text('Email tidak dapat diubah', style: TextStyle(fontSize: 11, color: context.textSecondary)),

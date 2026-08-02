@@ -222,7 +222,7 @@ class _DashboardEventCard extends StatelessWidget {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFF2DB), Color(0xFFE5BF), Color(0xFFFAF3)],
+                          colors: [Color(0x00fff2db), Color(0x00ffe5bf), Color(0x00fffaf3)],
                         ),
                       ),
                       child: const Center(
@@ -250,7 +250,7 @@ class _DashboardEventCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: _statusColor.withOpacity(0.1),
+                            color: _statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

@@ -52,7 +52,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Tolak Event',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -174,7 +174,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Detail Pengajuan',
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim, secondaryAnim, child) {
@@ -239,7 +239,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.5),
+                                        color: Colors.black.withValues(alpha: 0.5),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Row(
@@ -397,7 +397,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen> {
                   const SizedBox(height: 6),
                   Text(
                     'Tinjau dan setujui event yang diajukan oleh penyelenggara',
-                    style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.85)),
+                    style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                   ),
                 ],
               ),

@@ -47,7 +47,7 @@ class ScreenHeader extends StatelessWidget {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF2DB).withOpacity(0.12),
+                    color: const Color(0x00fff2db).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -61,7 +61,7 @@ class ScreenHeader extends StatelessWidget {
                 height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFFE5BF).withOpacity(0.10),
+                  color: const Color(0x00ffe5bf).withValues(alpha: 0.10),
                 ),
               ),
             ),
@@ -73,7 +73,7 @@ class ScreenHeader extends StatelessWidget {
                 height: 8,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.20),
+                  color: Colors.white.withValues(alpha: 0.20),
                 ),
               ),
             ),
@@ -93,12 +93,12 @@ class ScreenHeader extends StatelessWidget {
                           ),
                           if (subtitle != null) ...[
                             const SizedBox(height: 2),
-                            Text(subtitle!, style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.85))),
+                            Text(subtitle!, style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.85))),
                           ],
                         ],
                       ),
                     ),
-                    if (trailing != null) trailing!,
+                    ?trailing,
                   ],
                 ),
                 if (child != null) ...[

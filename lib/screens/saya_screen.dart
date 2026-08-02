@@ -90,7 +90,7 @@ class _SayaScreenState extends State<SayaScreen> {
                                   height: 140,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: const Color(0xFFFFFAF3).withOpacity(0.10),
+                                    color: const Color(0xFFFFFAF3).withValues(alpha: 0.10),
                                   ),
                                 ),
                               ),
@@ -102,7 +102,7 @@ class _SayaScreenState extends State<SayaScreen> {
                                   height: 110,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: const Color(0xFFFFE5BF).withOpacity(0.12),
+                                    color: const Color(0xFFFFE5BF).withValues(alpha: 0.12),
                                   ),
                                 ),
                               ),
@@ -114,7 +114,7 @@ class _SayaScreenState extends State<SayaScreen> {
                                   height: 18,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: const Color(0xFFFFF2DB).withOpacity(0.18),
+                                    color: const Color(0xFFFFF2DB).withValues(alpha: 0.18),
                                   ),
                                 ),
                               ),
@@ -140,7 +140,7 @@ class _SayaScreenState extends State<SayaScreen> {
                                       child: profile?['avatar_url'] == null
                                           ? CircleAvatar(
                                               radius: 38,
-                                              backgroundColor: AppColors.primary.withOpacity(0.15),
+                                              backgroundColor: AppColors.primary.withValues(alpha: 0.15),
                                               child: Text(
                                                 fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
                                                 style: const TextStyle(
@@ -170,7 +170,7 @@ class _SayaScreenState extends State<SayaScreen> {
                                       role,
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: Colors.white.withValues(alpha: 0.8),
                                       ),
                                     ),
                                   ),
@@ -194,7 +194,7 @@ class _SayaScreenState extends State<SayaScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: AppColors.accentBlue.withOpacity(0.08),
+                              color: AppColors.accentBlue.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: context.border, width: 1),
                             ),
@@ -374,7 +374,7 @@ class _DarkModeTile extends StatelessWidget {
       trailing: Switch(
         value: isDark,
         onChanged: (v) => toggleDarkMode(v),
-        activeColor: AppColors.primary,
+        activeThumbColor: AppColors.primary,
       ),
     );
   }

@@ -102,7 +102,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                         width: 70,
                         height: 6,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF2DB).withOpacity(0.15),
+                          color: const Color(0x00fff2db).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -114,7 +114,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                         width: 45,
                         height: 6,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE5BF).withOpacity(0.12),
+                          color: const Color(0x00ffe5bf).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -127,7 +127,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                         height: 55,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFFFAF3).withOpacity(0.10),
+                          color: const Color(0x00fffaf3).withValues(alpha: 0.10),
                         ),
                       ),
                     ),
@@ -146,7 +146,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                         const SizedBox(height: 6),
                         Text(
                           'Daftar event yang sudah disetujui atau ditolak',
-                          style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.85)),
+                          style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                         ),
                         const SizedBox(height: 16),
                         Container(
@@ -217,7 +217,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                         itemCount: _filteredHistory.length,
-                        separatorBuilder: (_, __) => Divider(height: 1, color: context.border),
+                        separatorBuilder: (_, _) => Divider(height: 1, color: context.border),
                         itemBuilder: (context, index) {
                           final item = _filteredHistory[index];
                           final profile = item['profiles'] as Map<String, dynamic>?;
@@ -259,7 +259,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                                           'Alasan: ${item['rejection_reason']}',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.red.withOpacity(0.8),
+                                            color: Colors.red.withValues(alpha: 0.8),
                                             fontStyle: FontStyle.italic,
                                           ),
                                         ),
@@ -271,7 +271,7 @@ class _AdminApprovalHistoryScreenState extends State<AdminApprovalHistoryScreen>
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(
-                                    color: isApproved ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                    color: isApproved ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(

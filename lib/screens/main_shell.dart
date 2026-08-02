@@ -76,7 +76,7 @@ class _MainShellState extends State<MainShell> {
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isActive ? AppColors.primary.withOpacity(0.08) : Colors.transparent,
+            color: isActive ? AppColors.primary.withValues(alpha: 0.08) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(

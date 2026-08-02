@@ -77,7 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             clipBehavior: Clip.none,
             itemCount: top.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (context, index) => SizedBox(
               width: MediaQuery.of(context).size.width * 0.75,
               child: _EventCard(event: top[index]),
@@ -155,7 +155,7 @@ class HomeScreenState extends State<HomeScreen> {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -182,7 +182,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   'Ajukan event baru bersama teman mahasiswa',
                                   style: TextStyle(
                                     fontSize: 11.5,
-                                    color: Colors.white.withOpacity(0.75),
+                                    color: Colors.white.withValues(alpha: 0.75),
                                   ),
                                 ),
                               ],
@@ -191,7 +191,7 @@ class HomeScreenState extends State<HomeScreen> {
                           Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 16,
-                            color: Colors.white.withOpacity(0.6),
+                            color: Colors.white.withValues(alpha: 0.6),
                           ),
                         ],
                       ),
@@ -342,12 +342,12 @@ class _EventCard extends StatelessWidget {
 
   Widget _avatarDot(BuildContext context) {
     return Container(
-      width: 14,
-      height: 14,
+      width: 34,
+      height: 34,
       decoration: BoxDecoration(
-        color: context.textSecondary.withOpacity(0.35),
+        color: context.textSecondary.withValues(alpha: 0.35),
         shape: BoxShape.circle,
-        border: Border.all(color: context.surface, width: 1.5),
+        border: Border.all(color: context.surface, width: 2),
       ),
     );
   }
@@ -391,9 +391,9 @@ class _EventCard extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Color(0xFFF2DB),
-                              Color(0xFFE5BF),
-                              Color(0xFFFAF3),
+                              Color(0x00fff2db),
+                              Color(0x00ffe5bf),
+                              Color(0x00fffaf3),
                             ],
                           ),
                         ),
@@ -419,7 +419,7 @@ class _EventCard extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.3),
+                              Colors.black.withValues(alpha: 0.3),
                             ],
                           ),
                         ),
@@ -437,7 +437,7 @@ class _EventCard extends StatelessWidget {
                             vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.92),
+                            color: Colors.white.withValues(alpha: 0.92),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.border,
@@ -597,23 +597,27 @@ class _EventCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: 30,
-                      height: 22,
+                      width: 58,
+                      height: 34,
                       child: Stack(
                         children: [
-                          Positioned(left: 0, top: 4, child: _avatarDot(context)),
-                          Positioned(left: 8, top: 4, child: _avatarDot(context)),
-                          Positioned(left: 16, top: 4, child: _avatarDot(context)),
+                          Positioned(left: 0, top: 0, child: _avatarDot(context)),
+                          Positioned(left: 12, top: 0, child: _avatarDot(context)),
+                          Positioned(left: 24, top: 0, child: _avatarDot(context)),
                         ],
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      '${event.participantCount} peserta',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: context.textSecondary,
+                    Flexible(
+                      child: Text(
+                        '${event.participantCount} peserta',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: context.textSecondary,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -622,7 +626,7 @@ class _EventCard extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.1),
+                        color: AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
@@ -755,7 +759,7 @@ class _AllEventsSheet extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: context.textSecondary.withOpacity(0.1),
+                          color: context.textSecondary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -807,7 +811,7 @@ class _AllEventsSheet extends StatelessWidget {
                         vertical: 12,
                       ),
                       itemCount: events.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
                       itemBuilder: (context, index) =>
                           _EventCard(event: events[index]),
                     );
@@ -861,7 +865,7 @@ class _CategoryFilter extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         itemCount: _categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final cat = _categories[i];
           final isActive =
@@ -917,7 +921,7 @@ class _HeaderSection extends StatelessWidget {
   final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
 
-  _HeaderSection({
+  const _HeaderSection({
     required this.searchController,
     required this.onSearchChanged,
   });
@@ -948,22 +952,22 @@ class _HeaderSection extends StatelessWidget {
             Positioned(
               top: -30,
               right: -20,
-              child: _decorCircle(100, const Color(0xFFE5BF).withOpacity(0.12)),
+              child: _decorCircle(100, const Color(0x00ffe5bf).withValues(alpha: 0.12)),
             ),
             Positioned(
               bottom: -35,
               left: -25,
-              child: _decorCircle(130, const Color(0xFFF2DB).withOpacity(0.10)),
+              child: _decorCircle(130, const Color(0x00fff2db).withValues(alpha: 0.10)),
             ),
             Positioned(
               top: 40,
               right: 60,
-              child: _decorCircle(30, const Color(0xFFFAF3).withOpacity(0.15)),
+              child: _decorCircle(30, const Color(0x00fffaf3).withValues(alpha: 0.15)),
             ),
             Positioned(
               bottom: 10,
               right: -10,
-              child: _decorCircle(45, const Color(0xFFE5BF).withOpacity(0.10)),
+              child: _decorCircle(45, const Color(0x00ffe5bf).withValues(alpha: 0.10)),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -982,7 +986,7 @@ class _HeaderSection extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -998,7 +1002,7 @@ class _HeaderSection extends StatelessWidget {
                   'Temukan dan ikuti event kampusmu',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
                 ),
                 const SizedBox(height: 16),

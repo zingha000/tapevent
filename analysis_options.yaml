@@ -9,6 +9,13 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # Web-only file. package:web 1.1.1 is incompatible with the analyzer's
+    # js_interop handling on non-web targets, so analyzing it produces
+    # spurious errors. It is excluded from analysis but still compiled for web.
+    - lib/web/pdf_web.dart
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
