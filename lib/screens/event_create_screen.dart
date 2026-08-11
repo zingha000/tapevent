@@ -440,6 +440,12 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
               controller: _maxParticipantsController,
               keyboardType: TextInputType.number,
               decoration: _decoration('Kosongkan jika tidak terbatas'),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                final n = int.tryParse(v.trim());
+                if (n == null || n <= 0) return 'Isi dengan angka lebih dari 0';
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 
@@ -470,7 +476,22 @@ class _EventCreateScreenState extends State<EventCreateScreen> {
             _Label('Link Formulir Pendaftaran (Google Form)'),
             TextFormField(
               controller: _formUrlController,
+              keyboardType: TextInputType.url,
               decoration: _decoration('https://forms.gle/...'),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                return EventService.isGoogleFormUrl(v)
+                    ? null
+                    : 'Link harus berupa Google Form (forms.gle / docs.google.com/forms)';
+              },
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Hanya link Google Form yang diizinkan (contoh: https://forms.gle/... atau https://docs.google.com/forms/...)',
+              style: TextStyle(
+                fontSize: 11,
+                color: context.textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
 

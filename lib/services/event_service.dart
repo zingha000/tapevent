@@ -99,6 +99,18 @@ class EventService {
     return Event.fromJson(data);
   }
 
+  /// Cek apakah sebuah URL adalah link Google Form yang valid.
+  /// Format yang diizinkan: forms.gle/..., docs.google.com/forms/..., forms.google.com/...
+  static bool isGoogleFormUrl(String url) {
+    final u = url.trim().toLowerCase();
+    return u.startsWith('https://forms.gle/') ||
+        u.startsWith('http://forms.gle/') ||
+        u.startsWith('https://docs.google.com/forms/') ||
+        u.startsWith('http://docs.google.com/forms/') ||
+        u.startsWith('https://forms.google.com/') ||
+        u.startsWith('http://forms.google.com/');
+  }
+
   /// Update field apa saja pada event (dipakai untuk edit judul, deskripsi, banner, dst)
   static Future<void> updateEvent(String eventId, Map<String, dynamic> fields) async {
     await supabase.from('events').update(fields).eq('id', eventId);

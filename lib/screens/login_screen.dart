@@ -157,14 +157,15 @@ class _LoginScreenState extends State<LoginScreen>
                           onPressed: _login,
                         ),
                         const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               'Belum punya akun? ',
                               style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
                                 color: context.textSecondary,
                               ),
                             ),
@@ -177,12 +178,12 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 );
                               },
-                              child: const Text(
+                              child: Text(
                                 'Daftar sekarang',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.accentBlue,
+                                  color: context.linkBlue,
                                 ),
                               ),
                             ),

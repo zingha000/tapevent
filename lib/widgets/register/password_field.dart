@@ -50,12 +50,12 @@ class PasswordField extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             TextFormField(
               controller: controller,
               focusNode: focusNode,
@@ -66,14 +66,14 @@ class PasswordField extends StatelessWidget {
                   ? (_) => nextFocusNode!.requestFocus()
                   : null,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 color: context.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: TextStyle(
-                  fontSize: 16,
-                  color: context.placeholderColor,
+                  fontSize: 14,
+                  color: context.textSecondary,
                 ),
                 prefixIcon: Icon(
                   Icons.lock_outline_rounded,
@@ -91,28 +91,28 @@ class PasswordField extends StatelessWidget {
                   onPressed: onToggleVisibility,
                 ),
                 filled: true,
-                fillColor: context.secondaryBg,
+                fillColor: context.surface,
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: context.border),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: context.border),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide:
-                      const BorderSide(color: AppColors.primary, width: 1.5),
+                      const BorderSide(color: AppColors.accentBlue, width: 1.5),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: AppColors.error),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide:
                       const BorderSide(color: AppColors.error, width: 1.5),
                 ),

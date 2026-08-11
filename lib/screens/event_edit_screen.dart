@@ -21,9 +21,24 @@ class _EventEditScreenState extends State<EventEditScreen> {
   late final TextEditingController _locationController;
   late final TextEditingController _organizerController;
   late final TextEditingController _contactController;
+  late final TextEditingController _maxParticipantsController;
+  late final TextEditingController _formUrlController;
 
   Uint8List? _newBannerBytes;
   bool _isSaving = false;
+
+  String? _category;
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  final _categories = [
+    'Workshop',
+    'Seminar',
+    'Lomba',
+    'Olahraga',
+    'Sosial',
+    'Lainnya',
+  ];
 
   @override
   void initState() {
@@ -44,6 +59,15 @@ class _EventEditScreenState extends State<EventEditScreen> {
     _contactController = TextEditingController(
       text: widget.event.contactPerson ?? '',
     );
+    _maxParticipantsController = TextEditingController(
+      text: widget.event.maxParticipants?.toString() ?? '',
+    );
+    _formUrlController = TextEditingController(
+      text: widget.event.registrationFormUrl ?? '',
+    );
+    _category = widget.event.category;
+    _startDate = widget.event.startDate;
+    _endDate = widget.event.endDate;
   }
 
   @override
@@ -54,7 +78,82 @@ class _EventEditScreenState extends State<EventEditScreen> {
     _locationController.dispose();
     _organizerController.dispose();
     _contactController.dispose();
+    _maxParticipantsController.dispose();
+    _formUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          datePickerTheme: DatePickerThemeData(
+            todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
+            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withValues(alpha: 0.1)),
+            dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return AppColors.primary;
+              return null;
+            }),
+            rangeSelectionBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            headerBackgroundColor: AppColors.primary,
+            headerForegroundColor: Colors.white,
+            dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return Colors.white;
+              return null;
+            }),
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      setState(() {
+        _startDate = picked;
+        if (_endDate != null && _endDate!.isBefore(picked)) {
+          _endDate = null;
+        }
+      });
+    }
+  }
+
+  Future<void> _pickEndDate() async {
+    if (_startDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tanggal mulai harus dipilih terlebih dahulu')),
+      );
+      return;
+    }
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate!.add(const Duration(days: 1)),
+      firstDate: _startDate!,
+      lastDate: _startDate!.add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          datePickerTheme: DatePickerThemeData(
+            todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
+            todayBackgroundColor: WidgetStatePropertyAll(AppColors.primary.withValues(alpha: 0.1)),
+            dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return AppColors.primary;
+              return null;
+            }),
+            rangeSelectionBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            headerBackgroundColor: AppColors.primary,
+            headerForegroundColor: Colors.white,
+            dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) return Colors.white;
+              return null;
+            }),
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _endDate = picked);
   }
 
   Future<void> _pickBanner() async {
@@ -85,6 +184,39 @@ class _EventEditScreenState extends State<EventEditScreen> {
       ).showSnackBar(const SnackBar(content: Text('Judul tidak boleh kosong')));
       return;
     }
+    if (_startDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tanggal mulai event wajib diisi')),
+      );
+      return;
+    }
+    if (_endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tanggal berakhir event wajib diisi')),
+      );
+      return;
+    }
+    final formUrl = _formUrlController.text.trim();
+    if (formUrl.isNotEmpty && !EventService.isGoogleFormUrl(formUrl)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Link harus berupa Google Form (forms.gle / docs.google.com/forms)',
+          ),
+        ),
+      );
+      return;
+    }
+    final maxParticipantsRaw = _maxParticipantsController.text.trim();
+    final maxParticipants = maxParticipantsRaw.isEmpty
+        ? null
+        : int.tryParse(maxParticipantsRaw);
+    if (maxParticipantsRaw.isNotEmpty && maxParticipants == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Maksimal peserta harus berupa angka')),
+      );
+      return;
+    }
 
     setState(() => _isSaving = true);
     try {
@@ -98,6 +230,10 @@ class _EventEditScreenState extends State<EventEditScreen> {
         'description': _descriptionController.text.trim().isEmpty
             ? null
             : _descriptionController.text.trim(),
+        'category': _category,
+        'start_date': _startDate!.toIso8601String(),
+        'end_date': _endDate!.toIso8601String(),
+        'max_participants': maxParticipants,
         'location': _locationController.text.trim().isEmpty
             ? null
             : _locationController.text.trim(),
@@ -105,6 +241,7 @@ class _EventEditScreenState extends State<EventEditScreen> {
         'contact_person': _contactController.text.trim().isEmpty
             ? null
             : _contactController.text.trim(),
+        'registration_form_url': formUrl.isEmpty ? null : formUrl,
         'banner_url': bannerUrl,
       });
 
@@ -112,7 +249,8 @@ class _EventEditScreenState extends State<EventEditScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Event berhasil diperbarui')),
       );
-      final updatedEvent = widget.event.copyWith(
+      final updatedEvent = Event(
+        id: widget.event.id,
         title: _titleController.text.trim(),
         tagline: _taglineController.text.trim().isEmpty
             ? null
@@ -120,14 +258,28 @@ class _EventEditScreenState extends State<EventEditScreen> {
         description: _descriptionController.text.trim().isEmpty
             ? null
             : _descriptionController.text.trim(),
+        bannerUrl: bannerUrl,
+        category: _category,
+        startDate: _startDate!,
+        endDate: _endDate,
+        maxParticipants: maxParticipants,
+        location: _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
         organizerName: _organizerController.text.trim(),
         contactPerson: _contactController.text.trim().isEmpty
             ? null
             : _contactController.text.trim(),
-        location: _locationController.text.trim().isEmpty
-            ? null
-            : _locationController.text.trim(),
-        bannerUrl: bannerUrl,
+        registrationFormUrl: formUrl.isEmpty ? null : formUrl,
+        accessCode: widget.event.accessCode,
+        status: widget.event.status,
+        documentationUrl: widget.event.documentationUrl,
+        certificateUrl: widget.event.certificateUrl,
+        createdBy: widget.event.createdBy,
+        rejectionReason: widget.event.rejectionReason,
+        qrSecret: widget.event.qrSecret,
+        proofDocumentUrl: widget.event.proofDocumentUrl,
+        participantCount: widget.event.participantCount,
       );
       Navigator.of(context).pop(updatedEvent);
     } catch (e) {
@@ -291,6 +443,83 @@ class _EventEditScreenState extends State<EventEditScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      _Label('Kategori'),
+                      DropdownButtonFormField<String>(
+                        initialValue: _category,
+                        decoration: _decoration('Pilih kategori'),
+                        items: _categories
+                            .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                            .toList(),
+                        onChanged: (v) => setState(() => _category = v),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Tanggal Mulai'),
+                      InkWell(
+                        onTap: _pickStartDate,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InputDecorator(
+                          decoration: _decoration('Pilih tanggal mulai'),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today_rounded, size: 18, color: _startDate == null ? context.textSecondary : AppColors.primary),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  _startDate == null
+                                      ? 'Belum dipilih'
+                                      : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: _startDate == null
+                                        ? context.textSecondary
+                                        : context.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Tanggal Berakhir'),
+                      InkWell(
+                        onTap: _pickEndDate,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InputDecorator(
+                          decoration: _decoration('Pilih tanggal berakhir'),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today_rounded, size: 18, color: _endDate == null ? context.textSecondary : AppColors.success),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  _endDate == null
+                                      ? 'Belum dipilih'
+                                      : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: _endDate == null
+                                        ? context.textSecondary
+                                        : context.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Maksimal Jumlah Peserta'),
+                      TextField(
+                        controller: _maxParticipantsController,
+                        keyboardType: TextInputType.number,
+                        decoration: _decoration('Kosongkan jika tidak terbatas'),
+                      ),
+                      const SizedBox(height: 16),
+
                       _Label('Lokasi'),
                       TextField(
                         controller: _locationController,
@@ -309,6 +538,22 @@ class _EventEditScreenState extends State<EventEditScreen> {
                       TextField(
                         controller: _contactController,
                         decoration: _decoration('Nomor kontak'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _Label('Link Formulir Pendaftaran (Google Form)'),
+                      TextField(
+                        controller: _formUrlController,
+                        keyboardType: TextInputType.url,
+                        decoration: _decoration('https://forms.gle/...'),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Hanya link Google Form yang diizinkan (contoh: https://forms.gle/... atau https://docs.google.com/forms/...)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: context.textSecondary,
+                        ),
                       ),
                     ],
                   ),

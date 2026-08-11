@@ -42,23 +42,9 @@ class _RegisterScreenState extends State<RegisterScreen>
   final _passwordFocus = FocusNode();
   final _confirmPasswordFocus = FocusNode();
 
-  late final AnimationController _animController;
-  late final Animation<double> _fadeAnim;
-  late final Animation<Offset> _slideAnim;
-
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
-    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)
-        .animate(
-          CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
-        );
-    _animController.forward();
   }
 
   @override
@@ -75,7 +61,6 @@ class _RegisterScreenState extends State<RegisterScreen>
     _phoneFocus.dispose();
     _passwordFocus.dispose();
     _confirmPasswordFocus.dispose();
-    _animController.dispose();
     super.dispose();
   }
 
@@ -126,7 +111,9 @@ class _RegisterScreenState extends State<RegisterScreen>
           context: context,
           barrierDismissible: false,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -185,164 +172,157 @@ class _RegisterScreenState extends State<RegisterScreen>
     return Scaffold(
       backgroundColor: context.bg,
       body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnim,
-          child: SlideTransition(
-            position: _slideAnim,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Form(
-                    key: _formKey,
-                    onChanged: () => setState(() {}),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const HeaderSection(),
-                        const SizedBox(height: 32),
-                        AppTextField(
-                          controller: _nameController,
-                          label: 'Nama Lengkap',
-                          hint: 'Masukkan nama lengkap',
-                          icon: Icons.person_outline_rounded,
-                          textCapitalization: TextCapitalization.words,
-                          focusNode: _nameFocus,
-                          nextFocusNode: _idFocus,
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Nama wajib diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        RoleSelector(
-                          selectedRole: _role,
-                          onRoleChanged: _onRoleChanged,
-                        ),
-                        const SizedBox(height: 24),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          switchInCurve: Curves.easeIn,
-                          switchOutCurve: Curves.easeOut,
-                          child: AppTextField(
-                            key: ValueKey(_role),
-                            controller: _idController,
-                            label: _idLabel,
-                            hint: _idHint,
-                            icon: Icons.badge_outlined,
-                            keyboardType: TextInputType.number,
-                            focusNode: _idFocus,
-                            nextFocusNode: _emailFocus,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return '$_idLabel wajib diisi';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          controller: _emailController,
-                          label: 'Email',
-                          hint: 'nama@email.com',
-                          icon: Icons.mail_outline_rounded,
-                          keyboardType: TextInputType.emailAddress,
-                          focusNode: _emailFocus,
-                          nextFocusNode: _phoneFocus,
-                          showSuccess:
-                              _emailController.text.contains('@') &&
-                              _emailController.text.trim().isNotEmpty,
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Email wajib diisi';
-                            }
-                            if (!v.contains('@')) {
-                              return 'Format email tidak valid';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          controller: _phoneController,
-                          label: 'Nomor Telepon',
-                          hint: '08xxxxxxxxxx',
-                          icon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                          textInputAction: TextInputAction.next,
-                          focusNode: _phoneFocus,
-                          nextFocusNode: _passwordFocus,
-                          showSuccess:
-                              _phoneController.text.trim().length >= 10 &&
-                              _phoneController.text.trim().isNotEmpty,
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Nomor telepon wajib diisi';
-                            }
-                            if (v.trim().length < 10) {
-                              return 'Nomor telepon minimal 10 digit';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        PasswordField(
-                          controller: _passwordController,
-                          label: 'Password',
-                          hint: 'Masukkan password',
-                          obscureText: _obscurePassword,
-                          onToggleVisibility: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                          focusNode: _passwordFocus,
-                          nextFocusNode: _confirmPasswordFocus,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return 'Password wajib diisi';
-                            }
-                            if (v.length < 8) {
-                              return 'Password minimal 8 karakter';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        PasswordField(
-                          controller: _confirmPasswordController,
-                          label: 'Konfirmasi Password',
-                          hint: 'Ulangi password',
-                          obscureText: _obscureConfirmPassword,
-                          onToggleVisibility: () => setState(
-                            () => _obscureConfirmPassword =
-                                !_obscureConfirmPassword,
-                          ),
-                          focusNode: _confirmPasswordFocus,
-                          textInputAction: TextInputAction.done,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return 'Konfirmasi password wajib diisi';
-                            }
-                            if (v != _passwordController.text) {
-                              return 'Password tidak cocok';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 32),
-                        PrimaryButton(
-                          label: 'Daftar',
-                          isLoading: _isLoading,
-                          onPressed: _submit,
-                        ),
-                        const SizedBox(height: 20),
-                        FooterLogin(onPressed: () => Navigator.pop(context)),
-                      ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Form(
+                key: _formKey,
+                onChanged: () => setState(() {}),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const HeaderSection(),
+                    const SizedBox(height: 32),
+                    AppTextField(
+                      controller: _nameController,
+                      label: 'Nama Lengkap',
+                      hint: 'Masukkan nama lengkap',
+                      icon: Icons.person_outline_rounded,
+                      textCapitalization: TextCapitalization.words,
+                      focusNode: _nameFocus,
+                      nextFocusNode: _idFocus,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Nama wajib diisi';
+                        }
+                        return null;
+                      },
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    RoleSelector(
+                      selectedRole: _role,
+                      onRoleChanged: _onRoleChanged,
+                    ),
+                    const SizedBox(height: 24),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      switchInCurve: Curves.easeIn,
+                      switchOutCurve: Curves.easeOut,
+                      child: AppTextField(
+                        key: ValueKey(_role),
+                        controller: _idController,
+                        label: _idLabel,
+                        hint: _idHint,
+                        icon: Icons.badge_outlined,
+                        keyboardType: TextInputType.number,
+                        focusNode: _idFocus,
+                        nextFocusNode: _emailFocus,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return '$_idLabel wajib diisi';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _emailController,
+                      label: 'Email',
+                      hint: 'nama@email.com',
+                      icon: Icons.mail_outline_rounded,
+                      keyboardType: TextInputType.emailAddress,
+                      focusNode: _emailFocus,
+                      nextFocusNode: _phoneFocus,
+                      showSuccess:
+                          _emailController.text.contains('@') &&
+                          _emailController.text.trim().isNotEmpty,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Email wajib diisi';
+                        }
+                        if (!v.contains('@')) {
+                          return 'Format email tidak valid';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _phoneController,
+                      label: 'Nomor Telepon',
+                      hint: '08xxxxxxxxxx',
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                      focusNode: _phoneFocus,
+                      nextFocusNode: _passwordFocus,
+                      showSuccess:
+                          _phoneController.text.trim().length >= 10 &&
+                          _phoneController.text.trim().isNotEmpty,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Nomor telepon wajib diisi';
+                        }
+                        if (v.trim().length < 10) {
+                          return 'Nomor telepon minimal 10 digit';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    PasswordField(
+                      controller: _passwordController,
+                      label: 'Password',
+                      hint: 'Masukkan password',
+                      obscureText: _obscurePassword,
+                      onToggleVisibility: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                      focusNode: _passwordFocus,
+                      nextFocusNode: _confirmPasswordFocus,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return 'Password wajib diisi';
+                        }
+                        if (v.length < 8) {
+                          return 'Password minimal 8 karakter';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    PasswordField(
+                      controller: _confirmPasswordController,
+                      label: 'Konfirmasi Password',
+                      hint: 'Ulangi password',
+                      obscureText: _obscureConfirmPassword,
+                      onToggleVisibility: () => setState(
+                        () =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword,
+                      ),
+                      focusNode: _confirmPasswordFocus,
+                      textInputAction: TextInputAction.done,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return 'Konfirmasi password wajib diisi';
+                        }
+                        if (v != _passwordController.text) {
+                          return 'Password tidak cocok';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    PrimaryButton(
+                      label: 'Daftar',
+                      isLoading: _isLoading,
+                      onPressed: _submit,
+                    ),
+                    const SizedBox(height: 20),
+                    FooterLogin(onPressed: () => Navigator.pop(context)),
+                  ],
                 ),
               ),
             ),

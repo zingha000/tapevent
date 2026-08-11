@@ -59,6 +59,8 @@ extension ThemeColors on BuildContext {
   Color get textSecondary => isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
   Color get placeholderColor => isDark ? AppColors.darkPlaceholder : AppColors.placeholder;
 
+  Color get linkBlue => isDark ? const Color(0xFF93A8E8) : const Color(0xFF1E3A8A);
+
   Color shadowColor([double opacity = 0.06]) =>
       isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: opacity);
 

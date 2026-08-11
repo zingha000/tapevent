@@ -8,26 +8,26 @@ class FooterLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          'Sudah memiliki akun?',
+          'Sudah memiliki akun? ',
           style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
+            fontSize: 13,
+            fontWeight: FontWeight.w400,
             color: context.textSecondary,
           ),
         ),
-        const SizedBox(height: 4),
         GestureDetector(
           onTap: onPressed,
-          child: const Text(
+          child: Text(
             'Masuk sekarang',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.accentBlue,
+              color: context.linkBlue,
             ),
           ),
         ),
