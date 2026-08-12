@@ -4,7 +4,7 @@ import 'dashboard_screen.dart';
 import 'riwayat_screen.dart';
 import 'saya_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_icons.dart';
+import '../widgets/floating_bottom_nav_bar.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -39,73 +39,12 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.bg,
+      extendBody: true,
       body: IndexedStack(index: _index, children: _pages),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: context.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          border: Border(
-            top: BorderSide(color: context.border, width: 1),
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-            child: Row(
-              children: [
-                _buildNavItem(0, AppIcons.home, 'Home'),
-                _buildNavItem(1, AppIcons.dashboard, 'Dashboard'),
-                _buildNavItem(2, AppIcons.history, 'Riwayat'),
-                _buildNavItem(3, AppIcons.profile, 'Saya'),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isActive = _index == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _onTabChanged(index),
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.primary.withValues(alpha: 0.08) : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedScale(
-                scale: isActive ? 1.15 : 1.0,
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: isActive ? AppColors.primary : context.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 3),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
-                  color: isActive ? AppColors.primary : context.textSecondary,
-                ),
-                child: Text(label),
-              ),
-            ],
-          ),
-        ),
+      bottomNavigationBar: FloatingBottomNavBar(
+        currentIndex: _index,
+        onTap: _onTabChanged,
       ),
     );
   }

@@ -69,15 +69,6 @@ class _RegisterScreenState extends State<RegisterScreen>
   String get _idHint =>
       _role == UserRole.mahasiswa ? 'Masukkan NIM' : 'Masukkan NIDN atau NIP';
 
-  bool get _isFormValid {
-    return _nameController.text.trim().isNotEmpty &&
-        _idController.text.trim().isNotEmpty &&
-        _emailController.text.trim().isNotEmpty &&
-        _phoneController.text.trim().isNotEmpty &&
-        _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty;
-  }
-
   void _onRoleChanged(UserRole role) {
     if (_role == role) return;
     setState(() {
@@ -171,163 +162,197 @@ class _RegisterScreenState extends State<RegisterScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.bg,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Form(
-                key: _formKey,
-                onChanged: () => setState(() {}),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const HeaderSection(),
-                    const SizedBox(height: 32),
-                    AppTextField(
-                      controller: _nameController,
-                      label: 'Nama Lengkap',
-                      hint: 'Masukkan nama lengkap',
-                      icon: Icons.person_outline_rounded,
-                      textCapitalization: TextCapitalization.words,
-                      focusNode: _nameFocus,
-                      nextFocusNode: _idFocus,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Nama wajib diisi';
-                        }
-                        return null;
-                      },
+      body: Stack(
+        children: [
+          // ===== Background register =====
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/bg_register.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 48,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Form(
+                    key: _formKey,
+                    onChanged: () => setState(() {}),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const HeaderSection(),
+                        const SizedBox(height: 32),
+                        AppTextField(
+                          controller: _nameController,
+                          label: 'Nama Lengkap',
+                          hint: 'Masukkan nama lengkap',
+                          icon: Icons.person_outline_rounded,
+                          textCapitalization: TextCapitalization.words,
+                          focusNode: _nameFocus,
+                          nextFocusNode: _idFocus,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Nama wajib diisi';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        RoleSelector(
+                          selectedRole: _role,
+                          onRoleChanged: _onRoleChanged,
+                        ),
+                        const SizedBox(height: 24),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          switchInCurve: Curves.easeIn,
+                          switchOutCurve: Curves.easeOut,
+                          child: AppTextField(
+                            key: ValueKey(_role),
+                            controller: _idController,
+                            label: _idLabel,
+                            hint: _idHint,
+                            icon: Icons.badge_outlined,
+                            keyboardType: TextInputType.number,
+                            focusNode: _idFocus,
+                            nextFocusNode: _emailFocus,
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return '$_idLabel wajib diisi';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          controller: _emailController,
+                          label: 'Email',
+                          hint: 'nama@email.com',
+                          icon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          focusNode: _emailFocus,
+                          nextFocusNode: _phoneFocus,
+                          showSuccess:
+                              _emailController.text.contains('@') &&
+                              _emailController.text.trim().isNotEmpty,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Email wajib diisi';
+                            }
+                            if (!v.contains('@')) {
+                              return 'Format email tidak valid';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          controller: _phoneController,
+                          label: 'Nomor Telepon',
+                          hint: '08xxxxxxxxxx',
+                          icon: Icons.phone_outlined,
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
+                          focusNode: _phoneFocus,
+                          nextFocusNode: _passwordFocus,
+                          showSuccess:
+                              _phoneController.text.trim().length >= 10 &&
+                              _phoneController.text.trim().isNotEmpty,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Nomor telepon wajib diisi';
+                            }
+                            if (v.trim().length < 10) {
+                              return 'Nomor telepon minimal 10 digit';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        PasswordField(
+                          controller: _passwordController,
+                          label: 'Password',
+                          hint: 'Masukkan password',
+                          obscureText: _obscurePassword,
+                          onToggleVisibility: () =>
+                              setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
+                          focusNode: _passwordFocus,
+                          nextFocusNode: _confirmPasswordFocus,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return 'Password wajib diisi';
+                            }
+                            if (v.length < 8) {
+                              return 'Password minimal 8 karakter';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        PasswordField(
+                          controller: _confirmPasswordController,
+                          label: 'Konfirmasi Password',
+                          hint: 'Ulangi password',
+                          obscureText: _obscureConfirmPassword,
+                          onToggleVisibility: () => setState(
+                            () =>
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword,
+                          ),
+                          focusNode: _confirmPasswordFocus,
+                          textInputAction: TextInputAction.done,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return 'Konfirmasi password wajib diisi';
+                            }
+                            if (v != _passwordController.text) {
+                              return 'Password tidak cocok';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 32),
+                        PrimaryButton(
+                          label: 'Daftar',
+                          isLoading: _isLoading,
+                          onPressed: _submit,
+                        ),
+                        const SizedBox(height: 20),
+                        FooterLogin(onPressed: () => Navigator.pop(context)),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    RoleSelector(
-                      selectedRole: _role,
-                      onRoleChanged: _onRoleChanged,
-                    ),
-                    const SizedBox(height: 24),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      switchInCurve: Curves.easeIn,
-                      switchOutCurve: Curves.easeOut,
-                      child: AppTextField(
-                        key: ValueKey(_role),
-                        controller: _idController,
-                        label: _idLabel,
-                        hint: _idHint,
-                        icon: Icons.badge_outlined,
-                        keyboardType: TextInputType.number,
-                        focusNode: _idFocus,
-                        nextFocusNode: _emailFocus,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return '$_idLabel wajib diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    AppTextField(
-                      controller: _emailController,
-                      label: 'Email',
-                      hint: 'nama@email.com',
-                      icon: Icons.mail_outline_rounded,
-                      keyboardType: TextInputType.emailAddress,
-                      focusNode: _emailFocus,
-                      nextFocusNode: _phoneFocus,
-                      showSuccess:
-                          _emailController.text.contains('@') &&
-                          _emailController.text.trim().isNotEmpty,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Email wajib diisi';
-                        }
-                        if (!v.contains('@')) {
-                          return 'Format email tidak valid';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    AppTextField(
-                      controller: _phoneController,
-                      label: 'Nomor Telepon',
-                      hint: '08xxxxxxxxxx',
-                      icon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
-                      focusNode: _phoneFocus,
-                      nextFocusNode: _passwordFocus,
-                      showSuccess:
-                          _phoneController.text.trim().length >= 10 &&
-                          _phoneController.text.trim().isNotEmpty,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Nomor telepon wajib diisi';
-                        }
-                        if (v.trim().length < 10) {
-                          return 'Nomor telepon minimal 10 digit';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    PasswordField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      hint: 'Masukkan password',
-                      obscureText: _obscurePassword,
-                      onToggleVisibility: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                      focusNode: _passwordFocus,
-                      nextFocusNode: _confirmPasswordFocus,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Password wajib diisi';
-                        }
-                        if (v.length < 8) {
-                          return 'Password minimal 8 karakter';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    PasswordField(
-                      controller: _confirmPasswordController,
-                      label: 'Konfirmasi Password',
-                      hint: 'Ulangi password',
-                      obscureText: _obscureConfirmPassword,
-                      onToggleVisibility: () => setState(
-                        () =>
-                            _obscureConfirmPassword = !_obscureConfirmPassword,
-                      ),
-                      focusNode: _confirmPasswordFocus,
-                      textInputAction: TextInputAction.done,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Konfirmasi password wajib diisi';
-                        }
-                        if (v != _passwordController.text) {
-                          return 'Password tidak cocok';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    PrimaryButton(
-                      label: 'Daftar',
-                      isLoading: _isLoading,
-                      onPressed: _submit,
-                    ),
-                    const SizedBox(height: 20),
-                    FooterLogin(onPressed: () => Navigator.pop(context)),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+          // ---- Tombol back ke halaman sebelumnya ----
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 20,
+                    color: context.textPrimary,
+                  ),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -48,6 +48,7 @@ dependencies:
   share_plus: ^12.0.2
   pdf: ^3.12.0
   web: ^1.1.1
+  flutter_svg: ^2.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +77,16 @@ flutter:
     - assets/animations/failed_check.json
     - assets/animations/loading.json
     - assets/animations/register.json
+    - assets/vectors/splash_wave.svg
+    - assets/images/tapevent_background.png
+    - assets/images/ornamen_splashscreen.png
+    - assets/images/logo.png
+    - assets/images/logo_horizontal.png
+    - assets/images/bg_login.png
+    - assets/images/bg_register.png
+    - assets/images/bg_home.png
+    - assets/images/bg1_home.png
+    - assets/images/calender.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

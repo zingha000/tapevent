@@ -2021,11 +2021,14 @@ class _EventManageScreenState extends State<EventManageScreen> {
                       ),
                     ),
                   const SizedBox(height: 16),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.surface,
+                  Material(
+                    // Material sebagai ancestor ListTile agar ink/ripple
+                    // tetap terlihat, dengan tampilan card yang sama.
+                    clipBehavior: Clip.antiAlias,
+                    color: context.surface,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: context.border, width: 1),
+                      side: BorderSide(color: context.border, width: 1),
                     ),
                     child: Column(
                       children: [

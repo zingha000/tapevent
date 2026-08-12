@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(e.message)));
+      ).showSnackBar(SnackBar(content: Text(_authErrorMessage(e))));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,118 +85,180 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  /// Menerjemahkan error auth dari Supabase ke pesan yang jelas.
+  ///
+  /// Catatan: untuk email & password salah, Supabase sengaja mengirim kode
+  /// yang sama (`invalid_credentials`) demi keamanan, jadi keduanya tidak
+  /// bisa dibedakan secara pasti dari sisi aplikasi.
+  String _authErrorMessage(AuthException e) {
+    switch (e.code) {
+      case 'invalid_credentials':
+        return 'Email atau password salah. Pastikan email sudah terdaftar '
+            'dan password yang dimasukkan benar.';
+      case 'email_not_confirmed':
+      case 'unverified_email':
+        return 'Email belum dikonfirmasi. Periksa kotak masuk email Anda '
+            'dan klik tautan verifikasi.';
+      case 'user_banned':
+        return 'Akun Anda diblokir. Hubungi administrator.';
+      case 'too_many_requests':
+      case 'over_request_rate_limit':
+        return 'Terlalu banyak percobaan masuk. Tunggu beberapa saat '
+            'lalu coba lagi.';
+      case 'validation_failed':
+        return 'Data login tidak valid. Periksa kembali email dan password.';
+      default:
+        // Fallback: tampilkan pesan asli dari server jika dikenal.
+        return e.message;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.bg,
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnim,
-          child: SlideTransition(
-            position: _slideAnim,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Form(
-                    key: _formKey,
-                    onChanged: () => setState(() {}),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const HeaderSection(),
-                        const SizedBox(height: 32),
-                        AppTextField(
-                          controller: _emailController,
-                          label: 'Email',
-                          hint: 'nama@email.com',
-                          icon: Icons.mail_outline_rounded,
-                          keyboardType: TextInputType.emailAddress,
-                          focusNode: _emailFocus,
-                          nextFocusNode: _passwordFocus,
-                          showSuccess:
-                              _emailController.text.contains('@') &&
-                              _emailController.text.trim().isNotEmpty,
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Email wajib diisi';
-                            }
-                            if (!v.contains('@')) {
-                              return 'Format email tidak valid';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        PasswordField(
-                          controller: _passwordController,
-                          label: 'Password',
-                          hint: 'Masukkan password',
-                          obscureText: _obscurePassword,
-                          onToggleVisibility: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                          focusNode: _passwordFocus,
-                          textInputAction: TextInputAction.done,
-                          showStrengthIndicator: false,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return 'Password wajib diisi';
-                            }
-                            if (v.length < 6) {
-                              return 'Password minimal 6 karakter';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 32),
-                        PrimaryButton(
-                          label: 'Masuk',
-                          isLoading: _isLoading,
-                          onPressed: _login,
-                        ),
-                        const SizedBox(height: 20),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
+      body: Stack(
+        children: [
+          // ===== Background login =====
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/bg_login.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: SlideTransition(
+                position: _slideAnim,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 48,
+                  ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 420),
+                      child: Form(
+                        key: _formKey,
+                        onChanged: () => setState(() {}),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
-                              'Belum punya akun? ',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: context.textSecondary,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const RegisterScreen(),
-                                  ),
-                                );
+                            const HeaderSection(),
+                            const SizedBox(height: 32),
+                            AppTextField(
+                              controller: _emailController,
+                              label: 'Email',
+                              hint: 'nama@email.com',
+                              icon: Icons.mail_outline_rounded,
+                              keyboardType: TextInputType.emailAddress,
+                              focusNode: _emailFocus,
+                              nextFocusNode: _passwordFocus,
+                              showSuccess:
+                                  _emailController.text.contains('@') &&
+                                  _emailController.text.trim().isNotEmpty,
+                              validator: (v) {
+                                if (v == null || v.trim().isEmpty) {
+                                  return 'Email wajib diisi';
+                                }
+                                if (!v.contains('@')) {
+                                  return 'Format email tidak valid';
+                                }
+                                return null;
                               },
-                              child: Text(
-                                'Daftar sekarang',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: context.linkBlue,
-                                ),
+                            ),
+                            const SizedBox(height: 16),
+                            PasswordField(
+                              controller: _passwordController,
+                              label: 'Password',
+                              hint: 'Masukkan password',
+                              obscureText: _obscurePassword,
+                              onToggleVisibility: () => setState(
+                                () =>
+                                    _obscurePassword =
+                                        !_obscurePassword,
                               ),
+                              focusNode: _passwordFocus,
+                              textInputAction: TextInputAction.done,
+                              showStrengthIndicator: false,
+                              validator: (v) {
+                                if (v == null || v.isEmpty) {
+                                  return 'Password wajib diisi';
+                                }
+                                if (v.length < 6) {
+                                  return 'Password minimal 6 karakter';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 32),
+                            PrimaryButton(
+                              label: 'Masuk',
+                              isLoading: _isLoading,
+                              onPressed: _login,
+                            ),
+                            const SizedBox(height: 20),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  'Belum punya akun? ',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: context.textSecondary,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const RegisterScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Daftar sekarang',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: context.linkBlue,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+          // ---- Tombol back ke halaman sebelumnya (onboarding) ----
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 20,
+                    color: context.textPrimary,
+                  ),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

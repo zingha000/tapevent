@@ -49,100 +49,135 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.bg,
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _refresh,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: ScreenHeader(
-                  title: 'Dashboard',
-                  subtitle: 'Event yang kamu buat atau kelola',
-                  child: Container(
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 14),
-                        Icon(Icons.search_rounded, color: Colors.grey.shade500, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (v) => setState(() => _query = v.toLowerCase()),
-                            style: const TextStyle(fontSize: 14, color: Color(0xFF1D1D1D)),
-                            decoration: InputDecoration(
-                              hintText: 'Cari event...',
-                              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                              border: InputBorder.none,
-                              isDense: true,
-                            ),
-                          ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Transform.translate(
+              offset: const Offset(0, 150),
+              child: Image.asset(
+                'assets/images/bg1_home.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: RefreshIndicator(
+              onRefresh: _refresh,
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: ScreenHeader(
+                      title: 'Dashboard',
+                      subtitle: 'Event yang kamu buat atau kelola',
+                      child: Container(
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 14),
+                            Icon(
+                              Icons.search_rounded,
+                              color: Colors.grey.shade500,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: (v) =>
+                                    setState(() => _query = v.toLowerCase()),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF1D1D1D),
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Cari event...',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontSize: 14,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-                sliver: FutureBuilder<List<Event>>(
-                  future: _eventsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 40),
-                          child: Center(
-                            child: SizedBox(width: 100, height: 100, child: LottieLoading()),
-                          ),
-                        ),
-                      );
-                    }
-                    final allEvents = snapshot.data ?? [];
-                    final events = allEvents.where((e) {
-                      if (_query.isEmpty) return true;
-                      return e.title.toLowerCase().contains(_query) ||
-                          e.organizerName.toLowerCase().contains(_query) ||
-                          (e.category ?? '').toLowerCase().contains(_query);
-                    }).toList();
-                    if (events.isEmpty) {
-                      return SliverFillRemaining(
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.dashboard_rounded, size: 40, color: context.textSecondary),
-                              const SizedBox(height: 10),
-                              Text(
-                                allEvents.isEmpty
-                                    ? 'Kamu belum membuat event apapun'
-                                    : 'Tidak ada event yang cocok',
-                                style: TextStyle(color: context.textSecondary),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+                    sliver: FutureBuilder<List<Event>>(
+                      future: _eventsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 40),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: LottieLoading(),
+                                ),
                               ),
-                            ],
+                            ),
+                          );
+                        }
+                        final allEvents = snapshot.data ?? [];
+                        final events = allEvents.where((e) {
+                          if (_query.isEmpty) return true;
+                          return e.title.toLowerCase().contains(_query) ||
+                              e.organizerName.toLowerCase().contains(_query) ||
+                              (e.category ?? '').toLowerCase().contains(_query);
+                        }).toList();
+                        if (events.isEmpty) {
+                          return SliverFillRemaining(
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.dashboard_rounded,
+                                    size: 40,
+                                    color: context.textSecondary,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    allEvents.isEmpty
+                                        ? 'Kamu belum membuat event apapun'
+                                        : 'Tidak ada event yang cocok',
+                                    style: TextStyle(
+                                      color: context.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _DashboardEventCard(
+                              event: events[index],
+                              onEventUpdated: _refresh,
+                            ),
+                            childCount: events.length,
                           ),
-                        ),
-                      );
-                    }
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => _DashboardEventCard(
-                          event: events[index],
-                          onEventUpdated: _refresh,
-                        ),
-                        childCount: events.length,
-                      ),
-                    );
-                  },
-                ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -222,20 +257,25 @@ class _DashboardEventCard extends StatelessWidget {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0x00fff2db), Color(0x00ffe5bf), Color(0x00fffaf3)],
+                          colors: [
+                            Color(0x00fff2db),
+                            Color(0x00ffe5bf),
+                            Color(0x00fffaf3),
+                          ],
                         ),
                       ),
                       child: const Center(
-                        child: Icon(Icons.image_outlined, size: 32, color: Colors.white70),
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 32,
+                          color: Colors.white70,
+                        ),
                       ),
                     ),
             ),
 
             // ─── Divider ───
-            Container(
-              width: 1,
-              color: AppColors.border,
-            ),
+            Container(width: 1, color: AppColors.border),
 
             // ─── Content (right side) ───
             Expanded(
@@ -248,7 +288,10 @@ class _DashboardEventCard extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: _statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -263,7 +306,11 @@ class _DashboardEventCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        Icon(AppIcons.calendar, size: 12, color: context.textSecondary),
+                        Icon(
+                          AppIcons.calendar,
+                          size: 12,
+                          color: context.textSecondary,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           '${event.startDate.day}/${event.startDate.month}/${event.startDate.year}',
@@ -325,12 +372,17 @@ class _DashboardEventCard extends StatelessWidget {
                         height: 32,
                         child: ElevatedButton(
                           onPressed: () async {
-                            final acceptedEvent = await showAccessCodeDialog(context, event);
-                            if (acceptedEvent == null || !context.mounted) return;
+                            final acceptedEvent = await showAccessCodeDialog(
+                              context,
+                              event,
+                            );
+                            if (acceptedEvent == null || !context.mounted)
+                              return;
                             final updatedEvent = await Navigator.push<Event>(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => EventManageScreen(event: acceptedEvent),
+                                builder: (_) =>
+                                    EventManageScreen(event: acceptedEvent),
                               ),
                             );
                             if (updatedEvent != null) onEventUpdated();
