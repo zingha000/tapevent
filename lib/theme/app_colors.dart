@@ -40,6 +40,13 @@ class AppColors {
   static const Color softBlue = Color(0xFF3B82F6);
   static const Color pageBackground = Color(0xFFF5F5F7);
 
+  // ===== Tombol biru =====
+  static const LinearGradient buttonGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0096EF), Color(0xFF0052D7)],
+  );
+
   static const LinearGradient splashGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

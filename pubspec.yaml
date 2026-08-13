@@ -86,6 +86,7 @@ flutter:
     - assets/images/bg_register.png
     - assets/images/bg_home.png
     - assets/images/bg1_home.png
+    - assets/images/bg_saya.png
     - assets/images/calender.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -258,17 +258,24 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
               SizedBox(
                 width: double.infinity,
                 height: 46,
-                child: ElevatedButton(
-                  onPressed: () {
-                    final updated = widget.event.copyWith(accessCode: _accessCode);
-                    Navigator.of(context).pop(updated);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accentBlue,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: AppColors.buttonGradient,
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Text('OK, Masuk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final updated = widget.event.copyWith(accessCode: _accessCode);
+                      Navigator.of(context).pop(updated);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      disabledBackgroundColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('OK, Masuk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  ),
                 ),
               ),
             ],
@@ -427,14 +434,21 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                   Expanded(
                     child: SizedBox(
                       height: 46,
-                      child: ElevatedButton(
-                        onPressed: _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.accentBlue,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.buttonGradient,
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Text('Masuk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        child: ElevatedButton(
+                          onPressed: _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            disabledBackgroundColor: Colors.transparent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                          child: const Text('Masuk', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        ),
                       ),
                     ),
                   ),

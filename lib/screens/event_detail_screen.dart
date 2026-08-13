@@ -153,8 +153,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 height: 46,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (reasonController.text.trim().isEmpty)
+                                    if (reasonController.text.trim().isEmpty) {
                                       return;
+                                    }
                                     Navigator.of(context).pop(true);
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -226,12 +227,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       final uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else if (context.mounted) {
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Tidak bisa membuka tautan')),
         );
       }
-    } else if (context.mounted) {
+    } else if (mounted) {
       _showNotReadyPopup(label);
     }
   }
@@ -308,20 +309,27 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: 46,
-                          child: ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.accentBlue,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: AppColors.buttonGradient,
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Text(
-                              'OK',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                disabledBackgroundColor: Colors.transparent,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: const Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
@@ -362,376 +370,458 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       backgroundColor: context.pageScaffoldColor,
       body: CustomScrollView(
         slivers: [
+          // ─── Hero Image / Foto Event ───
           SliverAppBar(
-            expandedHeight: 220,
+            expandedHeight: 300,
             pinned: true,
-            backgroundColor: AppColors.accentBlue,
+            backgroundColor: context.pageScaffoldColor,
+            foregroundColor: context.textPrimary,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
             leading: Padding(
-              padding: const EdgeInsets.only(left: 8, top: 4),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.25),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_rounded,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
+              padding: const EdgeInsets.fromLTRB(16, 14, 0, 6),
+              child: _HeroCircleButton(
+                icon: Icons.arrow_back_rounded,
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ),
             actions: [
               Padding(
-                padding: const EdgeInsets.only(right: 8, top: 4),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.share_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      final link =
-                          'https://tapevent.com/event/${widget.event.id}';
-                      Clipboard.setData(ClipboardData(text: link));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Link event disalin')),
-                      );
-                    },
-                  ),
+                padding: const EdgeInsets.fromLTRB(0, 14, 16, 6),
+                child: _HeroCircleButton(
+                  icon: Icons.share_rounded,
+                  onPressed: () {
+                    final link =
+                        'https://tapevent.com/event/${widget.event.id}';
+                    Clipboard.setData(ClipboardData(text: link));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Link event disalin')),
+                    );
+                  },
                 ),
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  widget.event.bannerUrl != null
-                      ? Image.network(
-                          widget.event.bannerUrl!,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppColors.accentPink,
-                                AppColors.accentBlue,
-                              ],
-                            ),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              size: 48,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black38],
-                        stops: [0.6, 1.0],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: context.surface,
+              collapseMode: CollapseMode.parallax,
+              background: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
+                  bottom: Radius.circular(28),
                 ),
-                border: Border(
-                  top: BorderSide(color: context.border, width: 1),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ─── Header: Title → Tagline → Jenis ───
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.event.title,
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                            color: context.textPrimary,
-                            height: 1.25,
-                          ),
-                        ),
-                        if (widget.event.tagline != null) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            widget.event.tagline!,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: context.textSecondary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                        if (widget.event.category != null) ...[
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.accentBlue.withValues(
-                                alpha: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              widget.event.category!,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.accentBlue,
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (!_loadingRegistration &&
-                            _myRegistration != null &&
-                            _myRegistration!['cancellation_requested'] !=
-                                true) ...[
-                          const SizedBox(height: 14),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const QrScanScreen(),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              decoration: BoxDecoration(
-                                color: AppColors.accentBlue.withValues(
-                                  alpha: 0.1,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.qr_code_scanner_rounded,
-                                    color: AppColors.accentBlue,
-                                    size: 22,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Scan Absen',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.accentBlue,
-                                    ),
-                                  ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    widget.event.bannerUrl != null
+                        ? Image.network(
+                            widget.event.bannerUrl!,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.accentPink,
+                                  AppColors.accentBlue,
                                 ],
                               ),
                             ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.image_outlined,
+                                size: 48,
+                                color: Colors.white70,
+                              ),
+                            ),
                           ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ─── Info Section: Jadwal → Lokasi → Penyelenggara → Contact → Kuota ───
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
+                    const DecoratedBox(
                       decoration: BoxDecoration(
-                        color: context.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: context.border, width: 1),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black26,
+                            Colors.black87,
+                          ],
+                          stops: [0.0, 0.55, 1.0],
+                        ),
                       ),
+                    ),
+                    Positioned(
+                      left: 24,
+                      right: 24,
+                      bottom: 20,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: _InfoRow(
-                                  icon: AppIcons.calendar,
-                                  label: 'Jadwal',
-                                  value: widget.event.endDate != null
-                                      ? '${_formatDate(widget.event.startDate)} - ${_formatDate(widget.event.endDate!)}'
-                                      : _formatDate(widget.event.startDate),
+                                child: Text(
+                                  widget.event.title,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    height: 1.25,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black38,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              if (widget.event.location != null) ...[
+                              if (widget.event.category != null) ...[
                                 const SizedBox(width: 12),
-                                Expanded(
-                                  child: _InfoRow(
-                                    icon: AppIcons.location,
-                                    label: 'Lokasi',
-                                    value: widget.event.location!,
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.22,
+                                      ),
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      widget.event.category!,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          _InfoRow(
-                            icon: Icons.groups_outlined,
-                            label: 'Penyelenggara',
-                            value: widget.event.organizerName,
-                          ),
-                          if (widget.event.contactPerson != null) ...[
-                            const SizedBox(height: 12),
-                            _InfoRow(
-                              icon: Icons.phone_outlined,
-                              label: 'Contact Person',
-                              value: widget.event.contactPerson!,
-                            ),
-                          ],
-                          if (widget.event.maxParticipants != null) ...[
-                            const SizedBox(height: 12),
-                            _InfoRow(
-                              icon: Icons.people_alt_outlined,
-                              label: 'Kuota Peserta',
-                              value:
-                                  '${widget.event.participantCount} / ${widget.event.maxParticipants}',
+                          if (widget.event.tagline != null) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              widget.event.tagline!,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.white.withValues(alpha: 0.95),
+                                height: 1.4,
+                                shadows: const [
+                                  Shadow(
+                                    color: Colors.black38,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ─── Scan Absen ───
+                if (!_loadingRegistration &&
+                    _myRegistration != null &&
+                    _myRegistration!['cancellation_requested'] != true) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const QrScanScreen(),
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        width: double.infinity,
+                        height: 116,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFFFFE3EF), Color(0xFFDCE9FF)],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 54,
+                              height: 54,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF7C5CFC),
+                                    Color(0xFF3B82F6),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(17),
+                              ),
+                              child: const Icon(
+                                Icons.qr_code_2_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Scan Absen',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                      color: context.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    'Scan QR untuk absen',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: context.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              color: Colors.black38,
+                              size: 26,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                ],
+                const SizedBox(height: 24),
 
-                  // ─── Dokumentasi & Sertifikat (hanya untuk completed) ───
-                  if (widget.event.status == 'completed') ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _DocCertButton(
-                              icon: Icons.photo_library_outlined,
-                              label: 'Dokumentasi',
-                              onPressed: () => _openDocCert(
-                                widget.event.documentationUrl,
-                                'Dokumentasi',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _DocCertButton(
-                              icon: Icons.verified_outlined,
-                              label: 'Sertifikat',
-                              onPressed: () => _openDocCert(
-                                widget.event.certificateUrl,
-                                'Sertifikat',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                // ─── Card Detail Event ───
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: context.border, width: 1),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // ─── Description ───
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: context.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: context.border, width: 1),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.description_outlined,
-                                size: 18,
-                                color: AppColors.accentBlue,
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _InfoRow(
+                                icon: AppIcons.calendar,
+                                label: 'Jadwal',
+                                value: widget.event.endDate != null
+                                    ? '${_formatDate(widget.event.startDate)} - ${_formatDate(widget.event.endDate!)}'
+                                    : _formatDate(widget.event.startDate),
+                                color: const Color(0xFF2563EB),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Deskripsi',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: context.textPrimary,
+                            ),
+                            if (widget.event.location != null) ...[
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _InfoRow(
+                                  icon: AppIcons.location,
+                                  label: 'Lokasi',
+                                  value: widget.event.location!,
+                                  color: const Color(0xFF10B981),
                                 ),
                               ),
                             ],
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            height: 150,
-                            width: double.infinity,
-                            alignment: Alignment.topLeft,
-                            child: SingleChildScrollView(
-                              child: Text(
-                                widget.event.description ??
-                                    'Belum ada deskripsi.',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  height: 1.6,
-                                  color: context.textSecondary,
-                                ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        const Divider(height: 1, thickness: 1),
+                        const SizedBox(height: 14),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _InfoRow(
+                                icon: Icons.groups_outlined,
+                                label: 'Penyelenggara',
+                                value: widget.event.organizerName,
+                                color: const Color(0xFF8B5CF6),
                               ),
                             ),
+                            if (widget.event.contactPerson != null) ...[
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _InfoRow(
+                                  icon: Icons.phone_outlined,
+                                  label: 'Contact Person',
+                                  value: widget.event.contactPerson!,
+                                  color: const Color(0xFFF43F5E),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        if (widget.event.maxParticipants != null) ...[
+                          const SizedBox(height: 14),
+                          const Divider(height: 1, thickness: 1),
+                          const SizedBox(height: 14),
+                          _InfoRow(
+                            icon: Icons.people_alt_outlined,
+                            label: 'Kuota Peserta',
+                            value:
+                                '${widget.event.participantCount} / ${widget.event.maxParticipants}',
+                            color: const Color(0xFFF59E0B),
                           ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                ),
+                const SizedBox(height: 20),
 
-                  // ─── Action Buttons ───
-                  if (widget.event.status != 'completed')
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          if (!_loadingRegistration &&
-                              _myRegistration == null) ...[
-                            SizedBox(
-                              width: double.infinity,
-                              height: 52,
+                // ─── Dokumentasi & Sertifikat (hanya untuk completed) ───
+                if (widget.event.status == 'completed') ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _DocCertButton(
+                            icon: Icons.photo_library_outlined,
+                            label: 'Dokumentasi',
+                            onPressed: () => _openDocCert(
+                              widget.event.documentationUrl,
+                              'Dokumentasi',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _DocCertButton(
+                            icon: Icons.verified_outlined,
+                            label: 'Sertifikat',
+                            onPressed: () => _openDocCert(
+                              widget.event.certificateUrl,
+                              'Sertifikat',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+
+                // ─── Card Deskripsi ───
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: context.border, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: AppColors.accentBlue.withValues(
+                                  alpha: 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.description_outlined,
+                                size: 16,
+                                color: AppColors.accentBlue,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Deskripsi',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: context.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          widget.event.description ?? 'Belum ada deskripsi.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 1.6,
+                            color: context.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ─── Aksi ───
+                if (widget.event.status != 'completed')
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        if (!_loadingRegistration &&
+                            _myRegistration == null) ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: AppColors.buttonGradient,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                               child: ElevatedButton.icon(
-                                onPressed: () => _openRegistrationForm(context),
+                                onPressed: () =>
+                                    _openRegistrationForm(context),
                                 icon: const Icon(
                                   Icons.edit_document,
                                   color: Colors.white,
@@ -746,7 +836,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.accentBlue,
+                                  backgroundColor: Colors.transparent,
+                                  disabledBackgroundColor:
+                                      Colors.transparent,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
@@ -754,90 +846,126 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Center(
-                              child: Text(
-                                'Akan membuka Google Form di luar aplikasi',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: context.textSecondary,
-                                ),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              'Akan membuka Google Form di luar aplikasi',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: context.textSecondary,
                               ),
                             ),
-                          ],
-
-                          if (!_loadingRegistration &&
-                              _myRegistration != null) ...[
-                            const SizedBox(height: 12),
-                            if (_myRegistration!['cancellation_requested'] ==
-                                true)
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Menunggu persetujuan panitia',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.orange,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            else
-                              SizedBox(
-                                width: double.infinity,
-                                height: 48,
-                                child: OutlinedButton(
-                                  onPressed: _requestCancellation,
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                      color: Colors.orange,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Ajukan Batal',
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-
-                          if (_loadingRegistration) ...[
-                            const SizedBox(height: 8),
-                            const Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: AppColors.accentBlue,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ],
-                      ),
+
+                        if (!_loadingRegistration &&
+                            _myRegistration != null) ...[
+                          const SizedBox(height: 12),
+                          if (_myRegistration!['cancellation_requested'] ==
+                              true)
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Menunggu persetujuan panitia',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: OutlinedButton(
+                                onPressed: _requestCancellation,
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFF59E0B)
+                                      .withValues(alpha: 0.08),
+                                  side: BorderSide(
+                                    color: context.border,
+                                    width: 1,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Ajukan Batal',
+                                  style: TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+
+                        if (_loadingRegistration) ...[
+                          const SizedBox(height: 8),
+                          const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: AppColors.accentBlue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
-                  const SizedBox(height: 32),
-                ],
-              ),
+                  ),
+                const SizedBox(height: 32),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeroCircleButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _HeroCircleButton({required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.85),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 42, height: 42),
+        icon: Icon(icon, color: Colors.black87, size: 21),
+        onPressed: onPressed,
       ),
     );
   }
@@ -847,11 +975,13 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final Color color;
 
   const _InfoRow({
     required this.icon,
     required this.label,
     required this.value,
+    this.color = AppColors.accentBlue,
   });
 
   @override
@@ -862,10 +992,10 @@ class _InfoRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.accentBlue.withValues(alpha: 0.08),
+            color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 18, color: AppColors.accentBlue),
+          child: Icon(icon, size: 18, color: color),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -908,21 +1038,28 @@ class _DocCertButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 56,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 20),
-        label: Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.buttonGradient,
+          borderRadius: BorderRadius.circular(14),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accentBlue,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+        child: ElevatedButton.icon(
+          onPressed: onPressed,
+          icon: Icon(icon, size: 20),
+          label: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            disabledBackgroundColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          ),
         ),
       ),
     );

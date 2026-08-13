@@ -3,6 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
 import '../services/profile_service.dart';
 import '../main.dart' show supabase, toggleDarkMode;
+import '../utils/static_content.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 import 'change_password_screen.dart';
@@ -51,10 +52,7 @@ class _SayaScreenState extends State<SayaScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/bg1_home.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/images/bg1_home.png', fit: BoxFit.cover),
           ),
           SafeArea(
             child: ListView(
@@ -370,8 +368,7 @@ class _SayaScreenState extends State<SayaScreen> {
                             title: 'Kebijakan & Privasi',
                             description:
                                 'Informasi mengenai privasi dan data pengguna',
-                            content:
-                                'Konten kebijakan privasi TapEvent akan ditambahkan di sini.',
+                            content: StaticContent.privacyPolicy,
                           ),
                         ),
                       ),
@@ -385,8 +382,7 @@ class _SayaScreenState extends State<SayaScreen> {
                           builder: (_) => const StaticInfoScreen(
                             title: 'Bantuan',
                             description: 'Pusat bantuan dan pertanyaan umum',
-                            content:
-                                'Halaman bantuan/FAQ TapEvent akan ditambahkan di sini.',
+                            content: StaticContent.help,
                           ),
                         ),
                       ),
@@ -400,8 +396,7 @@ class _SayaScreenState extends State<SayaScreen> {
                           builder: (_) => const StaticInfoScreen(
                             title: 'Tentang Aplikasi',
                             description: 'Informasi mengenai aplikasi TapEvent',
-                            content:
-                                'TapEvent — Digital Campus Event Management Platform.',
+                            content: StaticContent.about,
                           ),
                         ),
                       ),

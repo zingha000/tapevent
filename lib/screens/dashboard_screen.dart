@@ -189,13 +189,13 @@ class _DashboardEventCard extends StatelessWidget {
   Future<void> _openManage(BuildContext context) async {
     final acceptedEvent = await showAccessCodeDialog(context, event);
     if (acceptedEvent == null || !context.mounted) return;
-    final updatedEvent = await Navigator.push<Event>(
+    await Navigator.push<Event>(
       context,
       MaterialPageRoute(
         builder: (_) => EventManageScreen(event: acceptedEvent),
       ),
     );
-    if (updatedEvent != null) onEventUpdated();
+    if (context.mounted) onEventUpdated();
   }
 
   @override

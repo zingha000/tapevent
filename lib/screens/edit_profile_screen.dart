@@ -25,9 +25,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.profile['full_name'] ?? '');
-    _idController = TextEditingController(text: widget.profile['identity_number'] ?? '');
-    _phoneController = TextEditingController(text: widget.profile['phone'] ?? '');
+    _nameController = TextEditingController(
+      text: widget.profile['full_name'] ?? '',
+    );
+    _idController = TextEditingController(
+      text: widget.profile['identity_number'] ?? '',
+    );
+    _phoneController = TextEditingController(
+      text: widget.profile['phone'] ?? '',
+    );
   }
 
   @override
@@ -53,8 +59,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<String?> _uploadAvatar(String userId) async {
     if (_avatarBytes == null) return null;
-    final fileName = 'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    await supabase.storage.from('event-banners').uploadBinary(fileName, _avatarBytes!);
+    final fileName =
+        'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    await supabase.storage
+        .from('event-banners')
+        .uploadBinary(fileName, _avatarBytes!);
     return supabase.storage.from('event-banners').getPublicUrl(fileName);
   }
 
@@ -77,9 +86,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       await ProfileService.updateProfile(userId, fields);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data berhasil diperbarui')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Data berhasil diperbarui')));
       Navigator.pop(context);
     } catch (e) {
       debugPrint('EditProfile error: $e');
@@ -99,87 +108,198 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       backgroundColor: context.bg,
-      appBar: AppBar(
-        title: const Text('Data Pribadi'),
-        backgroundColor: AppColors.accentBlue,
-        foregroundColor: Colors.white,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: Stack(
         children: [
-          // ─── Avatar ───
-          Center(
-            child: GestureDetector(
-              onTap: _pickAvatar,
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 52,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    backgroundImage: _avatarBytes != null
-                        ? MemoryImage(_avatarBytes!)
-                        : (_currentAvatarUrl != null
-                            ? NetworkImage(_currentAvatarUrl!) as ImageProvider
-                            : null),
-                    child: _avatarBytes == null && _currentAvatarUrl == null
-                        ? Text(initial, style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: AppColors.primary))
-                        : null,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: context.bg, width: 2.5),
-                      ),
-                      child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 18),
-                    ),
-                  ),
-                ],
-              ),
+          // ===== Background saya =====
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/bg_saya.png',
+              fit: BoxFit.cover,
+              alignment: const Alignment(0, 0.35),
             ),
           ),
-          const SizedBox(height: 24),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ─── Header ───
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 8, 20, 0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_rounded,
+                          color: context.textPrimary,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Text(
+                    'Data Pribadi',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(height: 1, color: context.border),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      // ─── Avatar ───
+                      Center(
+                        child: GestureDetector(
+                          onTap: _pickAvatar,
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 52,
+                                backgroundColor: AppColors.primary.withValues(
+                                  alpha: 0.1,
+                                ),
+                                backgroundImage: _avatarBytes != null
+                                    ? MemoryImage(_avatarBytes!)
+                                    : (_currentAvatarUrl != null
+                                          ? NetworkImage(_currentAvatarUrl!)
+                                                as ImageProvider
+                                          : null),
+                                child:
+                                    _avatarBytes == null &&
+                                        _currentAvatarUrl == null
+                                    ? Text(
+                                        initial,
+                                        style: const TextStyle(
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primary,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: context.bg,
+                                      width: 2.5,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
 
-          _Label('Nama Lengkap'),
-          TextField(controller: _nameController, decoration: _decoration()),
-          const SizedBox(height: 16),
+                      _Label('Nama Lengkap'),
+                      TextField(
+                        controller: _nameController,
+                        decoration: _decoration(),
+                      ),
+                      const SizedBox(height: 16),
 
-          _Label(widget.profile['role'] == 'dosen' ? 'NIDN/NIP' : 'NIM'),
-          TextField(controller: _idController, decoration: _decoration()),
-          const SizedBox(height: 16),
+                      _Label(
+                        widget.profile['role'] == 'dosen' ? 'NIDN/NIP' : 'NIM',
+                      ),
+                      TextField(
+                        controller: _idController,
+                        decoration: _decoration(),
+                      ),
+                      const SizedBox(height: 16),
 
-          _Label('Nomor Telepon'),
-          TextField(controller: _phoneController, decoration: _decoration()),
-          const SizedBox(height: 16),
+                      _Label('Nomor Telepon'),
+                      TextField(
+                        controller: _phoneController,
+                        decoration: _decoration(),
+                      ),
+                      const SizedBox(height: 16),
 
-          _Label('Email'),
-          TextField(
-            enabled: false,
-            controller: TextEditingController(text: widget.profile['email'] ?? ''),
-            decoration: _decoration().copyWith(fillColor: Colors.black.withValues(alpha: 0.03)),
-          ),
-          const SizedBox(height: 4),
-          Text('Email tidak dapat diubah', style: TextStyle(fontSize: 11, color: context.textSecondary)),
+                      _Label('Email'),
+                      TextField(
+                        enabled: false,
+                        controller: TextEditingController(
+                          text: widget.profile['email'] ?? '',
+                        ),
+                        decoration: _decoration().copyWith(
+                          fillColor: Colors.black.withValues(alpha: 0.03),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Email tidak dapat diubah',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: context.textSecondary,
+                        ),
+                      ),
 
-          const SizedBox(height: 28),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: _isSaving ? null : _save,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentBlue,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              child: _isSaving
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white))
-                  : const Text('Simpan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: AppColors.buttonGradient,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: _isSaving ? null : _save,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              disabledBackgroundColor: Colors.transparent,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: _isSaving
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Simpan',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -216,7 +336,14 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary)),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: context.textPrimary,
+        ),
+      ),
     );
   }
 }

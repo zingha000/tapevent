@@ -97,10 +97,12 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       backgroundColor: context.pageScaffoldColor,
       body: Stack(
         children: [
+          // ===== Background saya =====
           Positioned.fill(
             child: Image.asset(
-              'assets/images/bg1_home.png',
+              'assets/images/bg_saya.png',
               fit: BoxFit.cover,
+              alignment: const Alignment(0, 0.35),
             ),
           ),
           SafeArea(
@@ -224,34 +226,44 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                                     const SizedBox(width: 12),
                                     SizedBox(
                                       height: 42,
-                                      child: ElevatedButton.icon(
-                                        onPressed: () async {
-                                          final events = await _historyFuture;
-                                          if (!mounted) return;
-                                          _downloadHistory(events, name);
-                                        },
-                                        icon: const Icon(
-                                          Icons.download_rounded,
-                                          size: 18,
-                                        ),
-                                        label: const Text(
-                                          'Unduh',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: AppColors.buttonGradient,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
                                         ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.accentBlue,
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                        child: ElevatedButton.icon(
+                                          onPressed: () async {
+                                            final events =
+                                                await _historyFuture;
+                                            if (!mounted) return;
+                                            _downloadHistory(events, name);
+                                          },
+                                          icon: const Icon(
+                                            Icons.download_rounded,
+                                            size: 18,
+                                          ),
+                                          label: const Text(
+                                            'Unduh',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
                                             ),
                                           ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 14,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            disabledBackgroundColor:
+                                                Colors.transparent,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                            ),
                                           ),
                                         ),
                                       ),

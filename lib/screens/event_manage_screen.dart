@@ -492,17 +492,24 @@ class _EventManageScreenState extends State<EventManageScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: 46,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              _confirmRegenerateAccessCode();
-                            },
-                            icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
-                            label: const Text('Buat Kode Baru', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.accentBlue,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: AppColors.buttonGradient,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                _confirmRegenerateAccessCode();
+                              },
+                              icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+                              label: const Text('Buat Kode Baru', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                disabledBackgroundColor: Colors.transparent,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
                             ),
                           ),
                         ),
@@ -1511,26 +1518,33 @@ class _EventManageScreenState extends State<EventManageScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 54,
-                    child: ElevatedButton.icon(
-                      onPressed: _showQrDialog,
-                      icon: const Icon(
-                        Icons.qr_code_rounded,
-                        size: 22,
-                        color: Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.buttonGradient,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      label: const Text(
-                        'Tampilkan QR Absensi',
-                        style: TextStyle(
+                      child: ElevatedButton.icon(
+                        onPressed: _showQrDialog,
+                        icon: const Icon(
+                          Icons.qr_code_rounded,
+                          size: 22,
                           color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accentBlue,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                        label: const Text(
+                          'Tampilkan QR Absensi',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
                     ),
@@ -2190,31 +2204,38 @@ class _AssetCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             height: 44,
-            child: ElevatedButton(
-              onPressed: isLoading ? null : onSubmit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentBlue,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.buttonGradient,
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: isLoading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.2,
-                        color: Colors.white,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : onSubmit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  disabledBackgroundColor: Colors.transparent,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        buttonLabel,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    )
-                  : Text(
-                      buttonLabel,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+              ),
             ),
           ),
         ],
