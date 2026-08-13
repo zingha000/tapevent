@@ -40,11 +40,25 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.bg,
-      extendBody: true,
-      body: IndexedStack(index: _index, children: _pages),
-      bottomNavigationBar: FloatingBottomNavBar(
-        currentIndex: _index,
-        onTap: _onTabChanged,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: MediaQuery.removePadding(
+              context: context,
+              removeBottom: true,
+              child: IndexedStack(index: _index, children: _pages),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: FloatingBottomNavBar(
+              currentIndex: _index,
+              onTap: _onTabChanged,
+            ),
+          ),
+        ],
       ),
     );
   }

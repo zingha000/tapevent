@@ -241,7 +241,7 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
                   // Terpopuler: horizontal scroll, top by participantCount
                   SliverToBoxAdapter(child: _buildTerpopulerSection()),
-                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   SliverToBoxAdapter(
                     child: _SectionHeader(
                       title: 'Semua Event',
@@ -343,7 +343,7 @@ class _EventCard extends StatelessWidget {
   // Fixed height of everything below the banner (padding + typography + spacing).
   // Intentionally a touch larger than the sum of children so the fixed-height
   // horizontal list never overflows.
-  static const double _contentHeight = 147;
+  static const double _contentHeight = 158;
 
   static double widthFor(BuildContext context) =>
       MediaQuery.of(context).size.width - 56;
@@ -498,11 +498,13 @@ class _EventCard extends StatelessWidget {
               ),
             ),
 
-            // ─── Content (12h/8v padding, min height) ───
+            // ─── Content (12h/12b padding, extra top gap after banner) ───
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: _padding,
-                vertical: 8,
+              padding: const EdgeInsets.fromLTRB(
+                _padding,
+                14,
+                _padding,
+                _padding,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -575,10 +577,10 @@ class _EventCard extends StatelessWidget {
                     children: [
                       Icon(
                         AppIcons.calendar,
-                        size: 12,
+                        size: 14,
                         color: subtitleColor,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Expanded(
                         flex: 6,
                         child: Text(
@@ -586,7 +588,7 @@ class _EventCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: subtitleColor,
                             height: 1.3,
@@ -601,21 +603,21 @@ class _EventCard extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.business_center_rounded,
-                              size: 12,
+                              size: 14,
                               color: subtitleColor,
                             ),
-                            const SizedBox(width: 3),
+                            const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 event.organizerName.toUpperCase(),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
                                   color: subtitleColor,
                                   height: 1.3,
-                                  letterSpacing: 0.4,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
                             ),
@@ -741,12 +743,22 @@ class _SectionHeader extends StatelessWidget {
           if (actionText != null)
             GestureDetector(
               onTap: onAction,
-              child: Text(
-                actionText!,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.accentBlue,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: context.border, width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  actionText!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.accentBlue,
+                  ),
                 ),
               ),
             ),

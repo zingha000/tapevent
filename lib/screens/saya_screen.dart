@@ -50,12 +50,9 @@ class _SayaScreenState extends State<SayaScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Transform.translate(
-              offset: const Offset(0, 200),
-              child: Image.asset(
-                'assets/images/bg1_home.png',
-                fit: BoxFit.cover,
-              ),
+            child: Image.asset(
+              'assets/images/bg1_home.png',
+              fit: BoxFit.cover,
             ),
           ),
           SafeArea(

@@ -98,12 +98,9 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Transform.translate(
-              offset: const Offset(0, 150),
-              child: Image.asset(
-                'assets/images/bg1_home.png',
-                fit: BoxFit.cover,
-              ),
+            child: Image.asset(
+              'assets/images/bg1_home.png',
+              fit: BoxFit.cover,
             ),
           ),
           SafeArea(
