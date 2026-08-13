@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'dashboard_screen.dart';
-import 'riwayat_screen.dart';
+import 'jadwal_screen.dart';
 import 'saya_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/floating_bottom_nav_bar.dart';
@@ -22,9 +22,9 @@ class _MainShellState extends State<MainShell> {
   void initState() {
     super.initState();
     _pages = [
-      HomeScreen(key: _homeKey),
+      HomeScreen(key: _homeKey, onOpenJadwal: () => _onTabChanged(2)),
       const DashboardScreen(),
-      const RiwayatScreen(),
+      const JadwalScreen(),
       const SayaScreen(),
     ];
   }

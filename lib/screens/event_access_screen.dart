@@ -139,7 +139,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
           decoration: BoxDecoration(
             color: context.surface,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(AppRadius.global),
             border: Border.all(color: context.border, width: 1),
           ),
           child: Column(
@@ -151,7 +151,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 height: 56,
                 decoration: BoxDecoration(
                   color: AppColors.accentBlue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(AppRadius.inner),
                 ),
                 child: const Icon(Icons.vpn_key_rounded, color: AppColors.accentBlue, size: 28),
               ),
@@ -172,7 +172,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.accentBlue.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppRadius.inner),
                 ),
                 child: Row(
                   children: [
@@ -193,7 +193,7 @@ class _CreatorCodeDialogState extends State<_CreatorCodeDialog> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
                   color: context.bg,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.inner),
                   border: Border.all(color: AppColors.accentBlue.withValues(alpha: 0.2)),
                 ),
                 child: Text(
@@ -346,7 +346,7 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
           decoration: BoxDecoration(
             color: context.surface,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(AppRadius.global),
             border: Border.all(color: context.border, width: 1),
           ),
           child: Column(
@@ -358,7 +358,7 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                 height: 56,
                 decoration: BoxDecoration(
                   color: AppColors.accentBlue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(AppRadius.inner),
                 ),
                 child: const Icon(Icons.lock_outline_rounded, color: AppColors.accentBlue, size: 28),
               ),
@@ -389,19 +389,19 @@ class _EnterCodeDialogState extends State<_EnterCodeDialog> {
                   fillColor: context.bg,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.inner),
                     borderSide: BorderSide(color: AppColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.inner),
                     borderSide: BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.inner),
                     borderSide: const BorderSide(color: AppColors.accentBlue, width: 1.5),
                   ),
                   errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.inner),
                     borderSide: const BorderSide(color: AppColors.error),
                   ),
                 ),

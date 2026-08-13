@@ -6,6 +6,7 @@ class ScreenHeader extends StatelessWidget {
   final String? subtitle;
   final Widget? trailing;
   final Widget? child;
+  final bool showBackButton;
 
   const ScreenHeader({
     super.key,
@@ -13,6 +14,7 @@ class ScreenHeader extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.child,
+    this.showBackButton = false,
   });
 
   @override
@@ -80,6 +82,26 @@ class ScreenHeader extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (showBackButton) ...[
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        behavior: HitTestBehavior.opaque,
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

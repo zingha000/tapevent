@@ -62,7 +62,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     for (var i = 0; i < events.length; i++) {
       final e = events[i];
       final start =
-          '${e.startDate!.day}/${e.startDate!.month}/${e.startDate!.year}';
+          '${e.startDate.day}/${e.startDate.month}/${e.startDate.year}';
       final end = e.endDate != null
           ? '${e.endDate!.day}/${e.endDate!.month}/${e.endDate!.year}'
           : '-';
@@ -115,6 +115,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                         const ScreenHeader(
                           title: 'Riwayat',
                           subtitle: 'Event yang pernah kamu ikuti',
+                          showBackButton: true,
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),

@@ -6,10 +6,15 @@ import '../models/event.dart';
 import '../services/event_service.dart';
 import 'event_detail_screen.dart';
 import 'event_create_screen.dart';
+import 'jadwal_screen.dart';
 import '../widgets/lottie_loading.dart';
+import '../widgets/search_field.dart';
+import '../widgets/notification_popup.dart';
+import '../models/static_schedule.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback? onOpenJadwal;
+  const HomeScreen({super.key, this.onOpenJadwal});
 
   @override
   HomeScreenState createState() => HomeScreenState();
@@ -153,7 +158,7 @@ class HomeScreenState extends State<HomeScreen> {
                               ],
                               stops: [0.0, 0.35, 0.7, 1.0],
                             ),
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(AppRadius.global),
                             border: Border.all(
                               color: AppColors.border,
                               width: 0.8,
@@ -166,7 +171,7 @@ class HomeScreenState extends State<HomeScreen> {
                                 height: 56,
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(AppRadius.inner),
                                 ),
                                 child: const Icon(
                                   Icons.add_rounded,
@@ -207,7 +212,7 @@ class HomeScreenState extends State<HomeScreen> {
                                 clipBehavior: Clip.antiAlias,
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(AppRadius.inner),
                                 ),
                                 child: Image.asset(
                                   'assets/images/calender.png',
@@ -226,8 +231,13 @@ class HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  // ─── Preview 7 Hari ───
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  SliverToBoxAdapter(
+                    child: _SevenDayPreview(onOpenJadwal: widget.onOpenJadwal),
+                  ),
                   // ─── Category Filter ───
-                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   SliverToBoxAdapter(
                     child: _CategoryFilter(
                       selected: _selectedCategory,
@@ -409,7 +419,7 @@ class _EventCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: context.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.global),
           border: Border.all(color: context.border, width: 1),
         ),
         clipBehavior: Clip.antiAlias,
@@ -467,7 +477,7 @@ class _EventCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.92),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(AppRadius.global),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -534,7 +544,7 @@ class _EventCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: AppColors.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.inner),
                         ),
                         alignment: Alignment.center,
                         child: const Text(
@@ -681,7 +691,7 @@ class _EventCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.inner),
                         ),
                         alignment: Alignment.center,
                         child: const Text(
@@ -750,7 +760,7 @@ class _SectionHeader extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   border: Border.all(color: context.border, width: 1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.global),
                 ),
                 child: Text(
                   actionText!,
@@ -787,7 +797,9 @@ class _AllEventsSheet extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: context.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppRadius.global),
+            ),
           ),
           child: Column(
             children: [
@@ -798,7 +810,7 @@ class _AllEventsSheet extends StatelessWidget {
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppRadius.global),
                 ),
               ),
               // Title
@@ -887,6 +899,232 @@ class _AllEventsSheet extends StatelessWidget {
   }
 }
 
+class _SevenDayPreview extends StatefulWidget {
+  final VoidCallback? onOpenJadwal;
+  const _SevenDayPreview({this.onOpenJadwal});
+
+  @override
+  State<_SevenDayPreview> createState() => _SevenDayPreviewState();
+}
+
+class _SevenDayPreviewState extends State<_SevenDayPreview> {
+  static const _weekdayLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+
+  late final List<DateTime> _days;
+  late final List<StaticScheduleEvent> _events;
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    _days = List.generate(7, (i) => today.add(Duration(days: i)));
+    _events = staticScheduleEvents(now);
+  }
+
+  List<StaticScheduleEvent> _eventsOn(DateTime date) {
+    return _events.where((e) {
+      return e.date.year == date.year &&
+          e.date.month == date.month &&
+          e.date.day == date.day;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final upcomingCount = _events
+        .where(
+          (e) =>
+              !e.date.isBefore(_days.first) &&
+              e.date.isBefore(_days.first.add(const Duration(days: 7))),
+        )
+        .length;
+    final selectedDate = _days[_selectedIndex];
+    final selectedEvents = _eventsOn(selectedDate);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '7 Hari ke Depan',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: context.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+            decoration: context.cardDecoration,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    for (var i = 0; i < _days.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 4),
+                      Expanded(
+                        child: _DayCell(
+                          date: _days[i],
+                          isSelected: i == _selectedIndex,
+                          hasEvent: _events.any(
+                            (e) =>
+                                e.date.year == _days[i].year &&
+                                e.date.month == _days[i].month &&
+                                e.date.day == _days[i].day,
+                          ),
+                          onTap: () => setState(() => _selectedIndex = i),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Divider(height: 1, color: context.border),
+                const SizedBox(height: 10),
+                _SevenDayInfoBox(
+                  message: selectedEvents.isNotEmpty
+                      ? selectedEvents.map((e) => e.title).join(', ')
+                      : 'Kamu memiliki $upcomingCount event dalam 7 hari ke depan',
+                  onOpenJadwal: widget.onOpenJadwal,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DayCell extends StatelessWidget {
+  final DateTime date;
+  final bool isSelected;
+  final bool hasEvent;
+  final VoidCallback onTap;
+
+  const _DayCell({
+    required this.date,
+    required this.isSelected,
+    required this.hasEvent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _SevenDayPreviewState._weekdayLabels[date.weekday - 1],
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: context.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: isSelected
+                ? BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  )
+                : null,
+            child: Text(
+              '${date.day}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? Colors.white : context.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(
+              color: hasEvent ? AppColors.primary : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SevenDayInfoBox extends StatelessWidget {
+  final String message;
+  final VoidCallback? onOpenJadwal;
+  const _SevenDayInfoBox({required this.message, this.onOpenJadwal});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        final cb = onOpenJadwal;
+        if (cb != null) {
+          cb();
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const JadwalScreen()),
+          );
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [AppColors.accentBlue, AppColors.softBlue],
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.inner),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.calendar_month_rounded,
+              color: Colors.white,
+              size: 17,
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              Icons.arrow_forward_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CategoryFilter extends StatelessWidget {
   final String? selected;
   final ValueChanged<String?> onSelected;
@@ -943,7 +1181,7 @@ class _CategoryFilter extends StatelessWidget {
                 color: isActive
                     ? (color ?? AppColors.primary)
                     : context.surface,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.global),
                 border: Border.all(
                   color: isActive
                       ? (color ?? AppColors.primary)
@@ -1003,7 +1241,7 @@ class _HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
         (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(
-        bottom: Radius.circular(28),
+        bottom: Radius.circular(AppRadius.global),
       ),
       child: Stack(
         clipBehavior: Clip.hardEdge,
@@ -1072,7 +1310,7 @@ class _HeaderContent extends StatelessWidget {
                 width: 176,
                 height: 92,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppRadius.global),
                   child: Image.asset(
                     'assets/images/logo_horizontal.png',
                     fit: BoxFit.cover,
@@ -1080,17 +1318,41 @@ class _HeaderContent extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border, width: 1),
-                ),
-                child: const Icon(
-                  Icons.notifications_rounded,
-                  color: AppColors.primary,
-                  size: 24,
+              GestureDetector(
+                onTap: () => showNotificationPopup(context),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(AppRadius.global),
+                    border: Border.all(color: AppColors.border, width: 1),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(
+                        Icons.notifications_outlined,
+                        color: Color(0xFF1D1D1D),
+                        size: 24,
+                      ),
+                      Positioned(
+                        top: -3,
+                        right: -3,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -1105,43 +1367,9 @@ class _HeaderContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Container(
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border, width: 1),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  AppIcons.search,
-                  color: context.textSecondary,
-                  size: 20,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: onSearchChanged,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF1D1D1D),
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Cari event...',
-                      hintStyle: TextStyle(
-                        color: context.textSecondary,
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      isDense: true,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          SearchField(
+            controller: searchController,
+            onChanged: onSearchChanged,
           ),
         ],
       ),

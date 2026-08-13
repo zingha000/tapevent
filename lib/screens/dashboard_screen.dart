@@ -8,6 +8,7 @@ import 'event_access_screen.dart';
 import 'event_manage_screen.dart';
 import '../widgets/screen_header.dart';
 import '../widgets/lottie_loading.dart';
+import '../widgets/search_field.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -66,43 +67,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: ScreenHeader(
                       title: 'Dashboard',
                       subtitle: 'Event yang kamu buat atau kelola',
-                      child: Container(
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 14),
-                            Icon(
-                              Icons.search_rounded,
-                              color: Colors.grey.shade500,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                onChanged: (v) =>
-                                    setState(() => _query = v.toLowerCase()),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF1D1D1D),
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Cari event...',
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontSize: 14,
-                                  ),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: SearchField(
+                        controller: _searchController,
+                        onChanged: (v) =>
+                            setState(() => _query = v.toLowerCase()),
                       ),
                     ),
                   ),
@@ -204,37 +172,45 @@ class _DashboardEventCard extends StatelessWidget {
     }
   }
 
-  Color get _statusColor {
-    if (_isActive) return AppColors.success;
-    if (_isRejected) return AppColors.error;
-    if (event.status == 'completed') return AppColors.sand;
-    return AppColors.lightTextSecondary;
+  // Soft badge colors (light bg + dark text), matching the Free/Paid badge.
+  (Color, Color) get _statusColors {
+    switch (event.status) {
+      case 'pending':
+        return (const Color(0xFFF3F4F6), const Color(0xFF6B7280));
+      case 'rejected':
+        return (const Color(0xFFFEE2E2), const Color(0xFFDC2626));
+      case 'completed':
+        return (const Color(0xFFFEF3C7), const Color(0xFFB45309));
+      default:
+        return (const Color(0xFFDCFCE7), const Color(0xFF15803D));
+    }
+  }
+
+  Future<void> _openManage(BuildContext context) async {
+    final acceptedEvent = await showAccessCodeDialog(context, event);
+    if (acceptedEvent == null || !context.mounted) return;
+    final updatedEvent = await Navigator.push<Event>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EventManageScreen(event: acceptedEvent),
+      ),
+    );
+    if (updatedEvent != null) onEventUpdated();
   }
 
   @override
   Widget build(BuildContext context) {
     final greyedOut = !_isActive;
+    final (badgeBg, badgeFg) = _statusColors;
 
     return GestureDetector(
-      onTap: _isActive
-          ? () async {
-              final acceptedEvent = await showAccessCodeDialog(context, event);
-              if (acceptedEvent == null || !context.mounted) return;
-              final updatedEvent = await Navigator.push<Event>(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => EventManageScreen(event: acceptedEvent),
-                ),
-              );
-              if (updatedEvent != null) onEventUpdated();
-            }
-          : null,
+      onTap: _isActive ? () => _openManage(context) : null,
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
-        height: 130,
+        height: 118,
         decoration: BoxDecoration(
           color: context.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.global),
           border: Border.all(
             color: greyedOut ? Colors.black12 : AppColors.border,
             width: 0.8,
@@ -243,32 +219,74 @@ class _DashboardEventCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            // ─── Banner Image (left, full height) ───
+            // ─── Banner Image (wider, left) ───
             SizedBox(
-              width: 130,
+              width: 150,
               height: double.infinity,
-              child: event.bannerUrl != null
-                  ? Image.network(event.bannerUrl!, fit: BoxFit.cover)
-                  : Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0x00fff2db),
-                            Color(0x00ffe5bf),
-                            Color(0x00fffaf3),
-                          ],
-                        ),
-                      ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (event.bannerUrl != null)
+                    Image.network(event.bannerUrl!, fit: BoxFit.cover)
+                  else
+                    Container(
+                      color: context.secondaryBg,
                       child: const Center(
                         child: Icon(
                           Icons.image_outlined,
-                          size: 32,
+                          size: 28,
                           color: Colors.white70,
                         ),
                       ),
                     ),
+                  // Gradient overlay so the status label stays readable
+                  IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.45),
+                            Colors.transparent,
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Status label — top right corner of the photo
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: badgeBg,
+                        borderRadius: BorderRadius.circular(AppRadius.inner),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        _statusLabel,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: badgeFg,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             // ─── Divider ───
@@ -281,28 +299,24 @@ class _DashboardEventCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Status badge + date
+                    // Title beside date
                     Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _statusColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                        Expanded(
                           child: Text(
-                            _statusLabel,
+                            event.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: _statusColor,
+                              color: greyedOut
+                                  ? context.textSecondary
+                                  : context.textPrimary,
                             ),
                           ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 8),
                         Icon(
                           AppIcons.calendar,
                           size: 12,
@@ -312,32 +326,17 @@ class _DashboardEventCard extends StatelessWidget {
                         Text(
                           '${event.startDate.day}/${event.startDate.month}/${event.startDate.year}',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10.5,
                             color: context.textSecondary,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
-                    // Title
+                    // Pengelola
                     Text(
-                      event.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w700,
-                        color: greyedOut
-                            ? context.textSecondary
-                            : context.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-
-                    // Organizer
-                    Text(
-                      event.organizerName,
+                      'Pengelola: ${event.organizerName}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -347,7 +346,7 @@ class _DashboardEventCard extends StatelessWidget {
                     ),
 
                     if (_isRejected && event.rejectionReason != null) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         event.rejectionReason!,
                         maxLines: 1,
@@ -366,34 +365,21 @@ class _DashboardEventCard extends StatelessWidget {
                     if (_isActive)
                       SizedBox(
                         width: double.infinity,
-                        height: 32,
+                        height: 30,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            final acceptedEvent = await showAccessCodeDialog(
-                              context,
-                              event,
-                            );
-                            if (acceptedEvent == null || !context.mounted)
-                              return;
-                            final updatedEvent = await Navigator.push<Event>(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    EventManageScreen(event: acceptedEvent),
+                          onPressed: () => _openManage(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              elevation: 0,
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.inner,
+                                ),
                               ),
-                            );
-                            if (updatedEvent != null) onEventUpdated();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            elevation: 0,
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ),
                           child: const Text(
-                            'Kelola',
+                            'Kelola event',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,

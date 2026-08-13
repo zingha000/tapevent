@@ -48,6 +48,17 @@ class AppColors {
   );
 }
 
+/// Radius global untuk konsistensi antar elemen UI.
+class AppRadius {
+  AppRadius._();
+
+  /// Radius utama untuk box luar (container/card).
+  static const double global = 20;
+
+  /// Radius untuk elemen di dalam box = global - 4.
+  static const double inner = global - 4;
+}
+
 extension ThemeColors on BuildContext {
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
 
@@ -68,7 +79,7 @@ extension ThemeColors on BuildContext {
 
   BoxDecoration get cardDecoration => BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.global),
         border: Border.all(color: border, width: 1),
       );
 }

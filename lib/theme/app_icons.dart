@@ -8,6 +8,7 @@ class AppIcons {
   // Navigasi utama
   static const IconData home = Icons.home_rounded;
   static const IconData dashboard = Icons.grid_view_rounded;
+  static const IconData schedule = Icons.calendar_month_rounded;
   static const IconData history = Icons.history_rounded;
   static const IconData profile = Icons.person_rounded;
 

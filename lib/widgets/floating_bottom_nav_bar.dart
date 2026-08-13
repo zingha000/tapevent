@@ -17,7 +17,7 @@ class FloatingBottomNavBar extends StatelessWidget {
   static const List<({IconData icon, String label})> _items = [
     (icon: AppIcons.home, label: 'Home'),
     (icon: AppIcons.dashboard, label: 'Dashboard'),
-    (icon: AppIcons.history, label: 'Riwayat'),
+    (icon: AppIcons.schedule, label: 'Jadwal'),
     (icon: AppIcons.profile, label: 'Saya'),
   ];
 

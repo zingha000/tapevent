@@ -8,6 +8,7 @@ import 'edit_profile_screen.dart';
 import 'change_password_screen.dart';
 import 'static_info_screen.dart';
 import 'admin_approval_screen.dart';
+import 'riwayat_screen.dart';
 
 class SayaScreen extends StatefulWidget {
   const SayaScreen({super.key});
@@ -255,7 +256,9 @@ class _SayaScreenState extends State<SayaScreen> {
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: AppColors.accentBlue,
-                                        borderRadius: BorderRadius.circular(14),
+                                        borderRadius: BorderRadius.circular(
+                                          AppRadius.inner,
+                                        ),
                                       ),
                                       child: const Icon(
                                         Icons.admin_panel_settings_rounded,
@@ -330,6 +333,18 @@ class _SayaScreenState extends State<SayaScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => const ChangePasswordScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.history_rounded,
+                      label: 'Riwayat Event',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RiwayatScreen(),
                           ),
                         );
                       },
@@ -452,7 +467,10 @@ class _DarkModeTile extends StatelessWidget {
       trailing: Switch(
         value: isDark,
         onChanged: (v) => toggleDarkMode(v),
-        activeThumbColor: AppColors.primary,
+        activeThumbColor: Colors.white,
+        activeTrackColor: AppColors.primary,
+        inactiveThumbColor: Colors.white,
+        inactiveTrackColor: Colors.grey.withValues(alpha: 0.4),
       ),
     );
   }
